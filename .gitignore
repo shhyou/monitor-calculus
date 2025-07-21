@@ -1,0 +1,6 @@
+_build
+*.agdai
+MAlonzo/**
+*#
+*~
+.DS_Store
