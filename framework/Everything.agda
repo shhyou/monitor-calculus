@@ -15,20 +15,18 @@ import Data.Tick
 -- Helper for time complexity
 import Data.RawFilter
 
--- Syntaxes
+-- Section 3: the monitor calculus. Syntaxes
 import Syntax.Type
 import Syntax.Term
-
--- Template syntaxes (for modeling reduction rules), and annotation languages
+-- template syntaxes (for modeling reduction rules), and annotation languages
 import Syntax.Template
-import Annotation.Language
-
--- Operational semantics
+import Annotation.Language -- the definition of annotation language and monitor-related reduction rules
+-- operational semantics
 import OpSemantics.Base
 import OpSemantics.TypeSafety
 import OpSemantics.Properties
 
--- Interpretations, their properties (monotonicity and soundness), and simplified proof goals
+-- Section 4: Invariant, its properties (monotonicity and soundness), and simplified proof goals
 import Annotation.Interpretation
 import Annotation.Interpretation.Base
 import Annotation.Interpretation.MetaVar.Base
@@ -40,15 +38,14 @@ import Annotation.Interpretation.MetaVar.View
 import Annotation.Interpretation.MetaVar
 import Annotation.Interpretation.Decompose
 import Annotation.Interpretation.Property
-
--- Soundness of interpretation
+-- Soundness of invariant
 import Annotation.Soundness
 
--- Two example interpretations
+-- Two example invariants
 import Example.Empty.Interpretation
 import Example.ProxyVal.Interpretation
 
--- The trivial annotation language, and that there is an annotation projection
+-- The trivial annotation language, and that there is an instance projection
 -- from any annotation language to the trivial language.
 import Example.Unit.Annotation
 
@@ -60,33 +57,33 @@ import Example.Count.NonDecreasingInterpretation
 import Example.SimpleContract.ClosedAnnotation
 import Example.SimpleContract.ExtensibleAnnotation
 -- The corresponding progress theorem of the contract language. Since the wrappers cannot
--- accumulate, the theorem depends on the first-order interaction interpretation below.
+-- accumulate, the theorem depends on the first-order interaction invariant below.
 import Example.SimpleContract.Progress
 
 -- An example of first-order interaction between two modules.
--- The interpretation characterizes two modules that only interact through
+-- The invariant characterizes two modules that only interact through
 -- a first-order value (e.g., a first-order function).
 import Example.FirstOrder.FirstOrderTy
 import Example.FirstOrder.FlatBoundaryExpr
 import Example.FirstOrder.Interpretation
 
--- Findler-Felleisen contracts
+-- Section 2: Findler-Felleisen contracts
 import Contract.Common
 import Contract.Base
 import Contract.Satisfaction         -- The satisfaction relation for contracts
 import Contract.Vectorized
 import Contract.Monotonic            -- The non-masking property
-import Contract.MonotonicStratified  -- The non-masking property, for the stratified language
+import Contract.MonotonicStratified  -- The non-masking property, for the stratified annotation language
 import Contract.Progress             -- The full Progress theorem
 
--- Complete monitoring
+-- Section 5: Complete monitoring
 import Blame.Base
 import Blame.Ownership               -- The ownership consistency property
 import Blame.Sign
 import Blame.Consistency             -- The obligation consistency property
 import Blame.Progress                -- The full Progress theorem, for complete monitoring
 
--- Space-Efficient Contracts
+-- Section 6: Space-Efficient Contracts
 import SpaceEfficient.OrderedPredicate
 import SpaceEfficient.Base
 import SpaceEfficient.Cost.Checking             -- The number of contract checks
