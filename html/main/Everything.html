@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Everything</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Symbol">{-#</a> <a id="5" class="Keyword">OPTIONS</a> <a id="13" class="Pragma">--without-K</a> <a id="25" class="Pragma">--safe</a> <a id="32" class="Symbol">#-}</a>
+
+<a id="37" class="Keyword">module</a> <a id="44" href="Everything.html" class="Module">Everything</a> <a id="55" class="Keyword">where</a>
+
+<a id="62" class="Comment">-- Utilities, helper lemmas (about standard constructs)</a>
+<a id="118" class="Keyword">import</a> <a id="125" href="Utils.Misc.html" class="Module">Utils.Misc</a>
+<a id="136" class="Keyword">import</a> <a id="143" href="Data.VecProperties.html" class="Module">Data.VecProperties</a>
+<a id="162" class="Keyword">import</a> <a id="169" href="Data.IsNonEmpty.html" class="Module">Data.IsNonEmpty</a>
+<a id="185" class="Keyword">import</a> <a id="192" href="Data.NatProperties.html" class="Module">Data.NatProperties</a>
+<a id="211" class="Keyword">import</a> <a id="218" href="TransitionRelationUtil.html" class="Module">TransitionRelationUtil</a>
+
+<a id="242" class="Comment">-- The Tick monad that counts the number of operations</a>
+<a id="297" class="Keyword">import</a> <a id="304" href="Data.Tick.html" class="Module">Data.Tick</a>
+
+<a id="315" class="Comment">-- Helper for time complexity</a>
+<a id="345" class="Keyword">import</a> <a id="352" href="Data.RawFilter.html" class="Module">Data.RawFilter</a>
+
+<a id="368" class="Comment">-- Syntaxes</a>
+<a id="380" class="Keyword">import</a> <a id="387" href="Syntax.Type.html" class="Module">Syntax.Type</a>
+<a id="399" class="Keyword">import</a> <a id="406" href="Syntax.Term.html" class="Module">Syntax.Term</a>
+
+<a id="419" class="Comment">-- Template syntaxes (for modeling reduction rules), and annotation languages</a>
+<a id="497" class="Keyword">import</a> <a id="504" href="Syntax.Template.html" class="Module">Syntax.Template</a>
+<a id="520" class="Keyword">import</a> <a id="527" href="Annotation.Language.html" class="Module">Annotation.Language</a>
+
+<a id="548" class="Comment">-- Operational semantics</a>
+<a id="573" class="Keyword">import</a> <a id="580" href="OpSemantics.Base.html" class="Module">OpSemantics.Base</a>
+<a id="597" class="Keyword">import</a> <a id="604" href="OpSemantics.TypeSafety.html" class="Module">OpSemantics.TypeSafety</a>
+<a id="627" class="Keyword">import</a> <a id="634" href="OpSemantics.Properties.html" class="Module">OpSemantics.Properties</a>
+
+<a id="658" class="Comment">-- Interpretations, their properties (monotonicity and soundness), and simplified proof goals</a>
+<a id="752" class="Keyword">import</a> <a id="759" href="Annotation.Interpretation.html" class="Module">Annotation.Interpretation</a>
+<a id="785" class="Keyword">import</a> <a id="792" href="Annotation.Interpretation.Base.html" class="Module">Annotation.Interpretation.Base</a>
+<a id="823" class="Keyword">import</a> <a id="830" href="Annotation.Interpretation.MetaVar.Base.html" class="Module">Annotation.Interpretation.MetaVar.Base</a>
+<a id="869" class="Keyword">import</a> <a id="876" href="Annotation.Interpretation.MetaVar.Predicate.html" class="Module">Annotation.Interpretation.MetaVar.Predicate</a>
+<a id="920" class="Keyword">import</a> <a id="927" href="Annotation.Interpretation.MetaVar.BoundaryPredicate.html" class="Module">Annotation.Interpretation.MetaVar.BoundaryPredicate</a>
+<a id="979" class="Keyword">import</a> <a id="986" href="Annotation.Interpretation.MetaVar.ExpandedBoundaryPredicate.html" class="Module">Annotation.Interpretation.MetaVar.ExpandedBoundaryPredicate</a>
+<a id="1046" class="Keyword">import</a> <a id="1053" href="Annotation.Interpretation.MetaVar.Extract.html" class="Module">Annotation.Interpretation.MetaVar.Extract</a>
+<a id="1095" class="Keyword">import</a> <a id="1102" href="Annotation.Interpretation.MetaVar.View.html" class="Module">Annotation.Interpretation.MetaVar.View</a>
+<a id="1141" class="Keyword">import</a> <a id="1148" href="Annotation.Interpretation.MetaVar.html" class="Module">Annotation.Interpretation.MetaVar</a>
+<a id="1182" class="Keyword">import</a> <a id="1189" href="Annotation.Interpretation.Decompose.html" class="Module">Annotation.Interpretation.Decompose</a>
+<a id="1225" class="Keyword">import</a> <a id="1232" href="Annotation.Interpretation.Property.html" class="Module">Annotation.Interpretation.Property</a>
+
+<a id="1268" class="Comment">-- Soundness of interpretation</a>
+<a id="1299" class="Keyword">import</a> <a id="1306" href="Annotation.Soundness.html" class="Module">Annotation.Soundness</a>
+
+<a id="1328" class="Comment">-- Two example interpretations</a>
+<a id="1359" class="Keyword">import</a> <a id="1366" href="Example.Empty.Interpretation.html" class="Module">Example.Empty.Interpretation</a>
+<a id="1395" class="Keyword">import</a> <a id="1402" href="Example.ProxyVal.Interpretation.html" class="Module">Example.ProxyVal.Interpretation</a>
+
+<a id="1435" class="Comment">-- The trivial annotation language, and that there is an annotation projection</a>
+<a id="1514" class="Comment">-- from any annotation language to the trivial language.</a>
+<a id="1571" class="Keyword">import</a> <a id="1578" href="Example.Unit.Annotation.html" class="Module">Example.Unit.Annotation</a>
+
+<a id="1603" class="Comment">-- An example annotation language: counting the number of monitor-related reduction steps</a>
+<a id="1693" class="Keyword">import</a> <a id="1700" href="Example.Count.Annotation.html" class="Module">Example.Count.Annotation</a>
+<a id="1725" class="Keyword">import</a> <a id="1732" href="Example.Count.NonDecreasingInterpretation.html" class="Module">Example.Count.NonDecreasingInterpretation</a>
+
+<a id="1775" class="Comment">-- A simple contract annotation language which assumes that the wrappers do not accumulate</a>
+<a id="1866" class="Keyword">import</a> <a id="1873" href="Example.SimpleContract.ClosedAnnotation.html" class="Module">Example.SimpleContract.ClosedAnnotation</a>
+<a id="1913" class="Keyword">import</a> <a id="1920" href="Example.SimpleContract.ExtensibleAnnotation.html" class="Module">Example.SimpleContract.ExtensibleAnnotation</a>
+<a id="1964" class="Comment">-- The corresponding progress theorem of the contract language. Since the wrappers cannot</a>
+<a id="2054" class="Comment">-- accumulate, the theorem depends on the first-order interaction interpretation below.</a>
+<a id="2142" class="Keyword">import</a> <a id="2149" href="Example.SimpleContract.Progress.html" class="Module">Example.SimpleContract.Progress</a>
+
+<a id="2182" class="Comment">-- An example of first-order interaction between two modules.</a>
+<a id="2244" class="Comment">-- The interpretation characterizes two modules that only interact through</a>
+<a id="2319" class="Comment">-- a first-order value (e.g., a first-order function).</a>
+<a id="2374" class="Keyword">import</a> <a id="2381" href="Example.FirstOrder.FirstOrderTy.html" class="Module">Example.FirstOrder.FirstOrderTy</a>
+<a id="2413" class="Keyword">import</a> <a id="2420" href="Example.FirstOrder.FlatBoundaryExpr.html" class="Module">Example.FirstOrder.FlatBoundaryExpr</a>
+<a id="2456" class="Keyword">import</a> <a id="2463" href="Example.FirstOrder.Interpretation.html" class="Module">Example.FirstOrder.Interpretation</a>
+
+<a id="2498" class="Comment">-- Findler-Felleisen contracts</a>
+<a id="2529" class="Keyword">import</a> <a id="2536" href="Contract.Common.html" class="Module">Contract.Common</a>
+<a id="2552" class="Keyword">import</a> <a id="2559" href="Contract.Base.html" class="Module">Contract.Base</a>
+<a id="2573" class="Keyword">import</a> <a id="2580" href="Contract.Satisfaction.html" class="Module">Contract.Satisfaction</a>         <a id="2610" class="Comment">-- The satisfaction relation for contracts</a>
+<a id="2653" class="Keyword">import</a> <a id="2660" href="Contract.Vectorized.html" class="Module">Contract.Vectorized</a>
+<a id="2680" class="Keyword">import</a> <a id="2687" href="Contract.Monotonic.html" class="Module">Contract.Monotonic</a>            <a id="2717" class="Comment">-- The non-masking property</a>
+<a id="2745" class="Keyword">import</a> <a id="2752" href="Contract.MonotonicStratified.html" class="Module">Contract.MonotonicStratified</a>  <a id="2782" class="Comment">-- The non-masking property, for the stratified language</a>
+<a id="2839" class="Keyword">import</a> <a id="2846" href="Contract.Progress.html" class="Module">Contract.Progress</a>             <a id="2876" class="Comment">-- The full Progress theorem</a>
+
+<a id="2906" class="Comment">-- Complete monitoring</a>
+<a id="2929" class="Keyword">import</a> <a id="2936" href="Blame.Base.html" class="Module">Blame.Base</a>
+<a id="2947" class="Keyword">import</a> <a id="2954" href="Blame.Ownership.html" class="Module">Blame.Ownership</a>               <a id="2984" class="Comment">-- The ownership consistency property</a>
+<a id="3022" class="Keyword">import</a> <a id="3029" href="Blame.Sign.html" class="Module">Blame.Sign</a>
+<a id="3040" class="Keyword">import</a> <a id="3047" href="Blame.Consistency.html" class="Module">Blame.Consistency</a>             <a id="3077" class="Comment">-- The obligation consistency property</a>
+<a id="3116" class="Keyword">import</a> <a id="3123" href="Blame.Progress.html" class="Module">Blame.Progress</a>                <a id="3153" class="Comment">-- The full Progress theorem, for complete monitoring</a>
+
+<a id="3208" class="Comment">-- Space-Efficient Contracts</a>
+<a id="3237" class="Keyword">import</a> <a id="3244" href="SpaceEfficient.OrderedPredicate.html" class="Module">SpaceEfficient.OrderedPredicate</a>
+<a id="3276" class="Keyword">import</a> <a id="3283" href="SpaceEfficient.Base.html" class="Module">SpaceEfficient.Base</a>
+<a id="3303" class="Keyword">import</a> <a id="3310" href="SpaceEfficient.Cost.Checking.html" class="Module">SpaceEfficient.Cost.Checking</a>             <a id="3351" class="Comment">-- The number of contract checks</a>
+<a id="3384" class="Keyword">import</a> <a id="3391" href="SpaceEfficient.Cost.Join.html" class="Module">SpaceEfficient.Cost.Join</a>                 <a id="3432" class="Comment">-- The cost of collapsing flat contracts</a>
+<a id="3473" class="Keyword">import</a> <a id="3480" href="SpaceEfficient.Size.html" class="Module">SpaceEfficient.Size</a>
+<a id="3500" class="Keyword">import</a> <a id="3507" href="SpaceEfficient.Height.html" class="Module">SpaceEfficient.Height</a>
+<a id="3529" class="Keyword">import</a> <a id="3536" href="SpaceEfficient.Sign.html" class="Module">SpaceEfficient.Sign</a>
+<a id="3556" class="Keyword">import</a> <a id="3563" href="SpaceEfficient.LeafPredicate.html" class="Module">SpaceEfficient.LeafPredicate</a>
+<a id="3592" class="Keyword">import</a> <a id="3599" href="SpaceEfficient.TimeComplexity.html" class="Module">SpaceEfficient.TimeComplexity</a>            <a id="3640" class="Comment">-- time complexity bounds for join, joinp, and drop</a>
+<a id="3692" class="Keyword">import</a> <a id="3699" href="SpaceEfficient.NonRecursive.html" class="Module">SpaceEfficient.NonRecursive</a>
+<a id="3727" class="Comment">-- The preservation of various properties of the space-efficient contracts</a>
+<a id="3802" class="Keyword">import</a> <a id="3809" href="SpaceEfficient.Properties.NonEmpty.html" class="Module">SpaceEfficient.Properties.NonEmpty</a>       <a id="3850" class="Comment">-- non-emptiness</a>
+<a id="3867" class="Keyword">import</a> <a id="3874" href="SpaceEfficient.Properties.Height.html" class="Module">SpaceEfficient.Properties.Height</a>         <a id="3915" class="Comment">-- non-increasing of height</a>
+<a id="3943" class="Keyword">import</a> <a id="3950" href="SpaceEfficient.Properties.NonRecursive.html" class="Module">SpaceEfficient.Properties.NonRecursive</a>
+<a id="3989" class="Keyword">import</a> <a id="3996" href="SpaceEfficient.Properties.Size.html" class="Module">SpaceEfficient.Properties.Size</a>           <a id="4037" class="Comment">-- properties of leaf-size</a>
+<a id="4064" class="Keyword">import</a> <a id="4071" href="SpaceEfficient.Properties.Sublist.html" class="Module">SpaceEfficient.Properties.Sublist</a>        <a id="4112" class="Comment">-- join, drop, etc. respect sublists</a>
+<a id="4149" class="Keyword">import</a> <a id="4156" href="SpaceEfficient.Properties.UniqueSublist.html" class="Module">SpaceEfficient.Properties.UniqueSublist</a>  <a id="4197" class="Comment">-- join, drop, etc. preserve unique sublists</a>
+<a id="4242" class="Comment">-- The boundedness of contract checks and the boundedness of collapsing costs</a>
+<a id="4320" class="Keyword">import</a> <a id="4327" href="SpaceEfficient.Bounded.Base.html" class="Module">SpaceEfficient.Bounded.Base</a>
+<a id="4355" class="Keyword">import</a> <a id="4362" href="SpaceEfficient.Bounded.OpSemantics.html" class="Module">SpaceEfficient.Bounded.OpSemantics</a>
+<a id="4397" class="Keyword">import</a> <a id="4404" href="SpaceEfficient.Bounded.NonRecursiveHeight.html" class="Module">SpaceEfficient.Bounded.NonRecursiveHeight</a>
+<a id="4446" class="Keyword">import</a> <a id="4453" href="SpaceEfficient.Bounded.CheckingCost.html" class="Module">SpaceEfficient.Bounded.CheckingCost</a>
+<a id="4489" class="Keyword">import</a> <a id="4496" href="SpaceEfficient.Bounded.JoinCost.html" class="Module">SpaceEfficient.Bounded.JoinCost</a>
+<a id="4528" class="Keyword">import</a> <a id="4535" href="SpaceEfficient.Bounded.Size.html" class="Module">SpaceEfficient.Bounded.Size</a>
+<a id="4563" class="Keyword">import</a> <a id="4570" href="SpaceEfficient.Bounded.html" class="Module">SpaceEfficient.Bounded</a>
+<a id="4593" class="Comment">-- The equivalence of space-efficient contracts and Findler-Felleisen contracts</a>
+<a id="4673" class="Comment">-- via annotation-level simulation</a>
+<a id="4708" class="Keyword">import</a> <a id="4715" href="SpaceEfficient.Equivalence.Base.html" class="Module">SpaceEfficient.Equivalence.Base</a>
+<a id="4747" class="Keyword">import</a> <a id="4754" href="SpaceEfficient.Equivalence.OpSemantics.html" class="Module">SpaceEfficient.Equivalence.OpSemantics</a>
+<a id="4793" class="Keyword">import</a> <a id="4800" href="SpaceEfficient.Equivalence.Simulation.html" class="Module">SpaceEfficient.Equivalence.Simulation</a>
+<a id="4838" class="Keyword">import</a> <a id="4845" href="SpaceEfficient.Equivalence.Interpretation.html" class="Module">SpaceEfficient.Equivalence.Interpretation</a>
+<a id="4887" class="Keyword">import</a> <a id="4894" href="SpaceEfficient.Equivalence.Soundness.html" class="Module">SpaceEfficient.Equivalence.Soundness</a>
+<a id="4931" class="Keyword">import</a> <a id="4938" href="SpaceEfficient.Equivalence.html" class="Module">SpaceEfficient.Equivalence</a>
+</pre></body></html>
