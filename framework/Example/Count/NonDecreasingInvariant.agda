@@ -1,13 +1,13 @@
 {-# OPTIONS --without-K --safe #-}
 
-module Example.Count.NonDecreasingInterpretation where
+module Example.Count.NonDecreasingInvariant where
 
 open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
 open import Annotation.Language
-open import Annotation.Interpretation
+open import Annotation.Invariant
 open import Annotation.Soundness
 open import Example.Count.Annotation
 
@@ -37,21 +37,21 @@ module _ {𝒜 : AnnTerm} (𝒜view : AnnTermView 𝒜 𝒜cnt) where
   open AnnTerm 𝒜 using (Ann; State)
   open AnnTermViewUtils 𝒜view
 
-  ℐinc : ∀ 𝒯 → AnnIntr {𝒜} (𝒯 ∩tr 𝒯cnt 𝒜view)
-  AnnIntr.Ix         (ℐinc 𝒯) = ⊤
-  AnnIntr.IxRel      (ℐinc 𝒯) A ix ix′ = ⊤
-  AnnIntr.Inv        (ℐinc 𝒯) s = ⊤
-  AnnIntr.Ord        (ℐinc 𝒯) = _≤_ on (getState ∘′ proj₁)
-  AnnIntr.isPreorder (ℐinc 𝒯) =
+  ℐinc : ∀ 𝒯 → AnnInvr {𝒜} (𝒯 ∩tr 𝒯cnt 𝒜view)
+  AnnInvr.Ix         (ℐinc 𝒯) = ⊤
+  AnnInvr.IxRel      (ℐinc 𝒯) A ix ix′ = ⊤
+  AnnInvr.Inv        (ℐinc 𝒯) s = ⊤
+  AnnInvr.Ord        (ℐinc 𝒯) = _≤_ on (getState ∘′ proj₁)
+  AnnInvr.isPreorder (ℐinc 𝒯) =
     record  { isEquivalence = PropEq.isEquivalence
             ; reflexive = Nat.≤-reflexive ∘′ cong (getState ∘′ proj₁)
             ; trans = Nat.≤-trans
             }
-  AnnIntr.𝔹          (ℐinc 𝒯) A ix◁ix′ e = ⊤
-  AnnIntr.𝔹Sound     (ℐinc 𝒯) step inv inv′ mono bsat = bsat
-  AnnIntr.ℙ          (ℐinc 𝒯) {τ = τ} A ix◁ix′ em = ⊤
+  AnnInvr.𝔹          (ℐinc 𝒯) A ix◁ix′ e = ⊤
+  AnnInvr.𝔹Sound     (ℐinc 𝒯) step inv inv′ mono bsat = bsat
+  AnnInvr.ℙ          (ℐinc 𝒯) {τ = τ} A ix◁ix′ em = ⊤
 
-  ℐinc-monotonic : ∀ 𝒯 → AnnTransitInterpIs (ℐinc 𝒯) Monotonic
+  ℐinc-monotonic : ∀ 𝒯 → AnnInvrIs (ℐinc 𝒯) Monotonic
   ℐinc-monotonic 𝒯 `R-cross-unit {s₁ = s₁}
     (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
       trWit@(tr , c′≡1+c@refl))
@@ -125,7 +125,7 @@ module _ {𝒜 : AnnTerm} (𝒜view : AnnTermView 𝒜 𝒜cnt) where
     termSat =
       _ , subst (c ≤_) (sym (AnnTermView.put-get 𝒜view s₁ (suc c))) (Nat.m≤n+m c 1) where c = getState s₁
 
-  ℐinc-sound : ∀ 𝒯 → AnnTransitInterpIs (ℐinc 𝒯) Sound
+  ℐinc-sound : ∀ 𝒯 → AnnInvrIs (ℐinc 𝒯) Sound
   ℐinc-sound 𝒯 `R-cross-unit
     (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit trWit)
     (B/i ix ix′ ix◁ix′ bsat ⋆) termSat inv′,mono = record

@@ -39,7 +39,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 
 open Blame.Base Label hiding (module AnnBlameContractLang)
 open import Blame.Sign Label 𝒜
@@ -184,28 +184,28 @@ blcon-μ : ∀ {sκ} →
   BlameConsistent (signed-blame ± b) (μ/c-sκ sκ)
 blcon-μ (μ/p pmκ) (μ/bc bc) = bcsubst bc pmκ [pmκ0↦ μ/p pmκ ] [bc0↦ μ/bc bc ]
 
-ℐconsistent : (i : ℕ) → AnnIntr (𝒯 i)
-AnnIntr.Ix         (ℐconsistent i) = ⊤
-AnnIntr.IxRel      (ℐconsistent i) A ix ix′ = ⊤
-AnnIntr.Inv        (ℐconsistent i) s = ⊤
-AnnIntr.Ord        (ℐconsistent i) = trivialOrd
-AnnIntr.isPreorder (ℐconsistent i) = trivialOrdIsPreorder
-AnnIntr.𝔹          (ℐconsistent zero)    obsκs ix◁ix′ e = ⊥
-AnnIntr.𝔹          (ℐconsistent (suc i)) obsκs ix◁ix′ e =
+ℐconsistent : (i : ℕ) → AnnInvr (𝒯 i)
+AnnInvr.Ix         (ℐconsistent i) = ⊤
+AnnInvr.IxRel      (ℐconsistent i) A ix ix′ = ⊤
+AnnInvr.Inv        (ℐconsistent i) s = ⊤
+AnnInvr.Ord        (ℐconsistent i) = trivialOrd
+AnnInvr.isPreorder (ℐconsistent i) = trivialOrdIsPreorder
+AnnInvr.𝔹          (ℐconsistent zero)    obsκs ix◁ix′ e = ⊥
+AnnInvr.𝔹          (ℐconsistent (suc i)) obsκs ix◁ix′ e =
   All (SCtcSigned pos [] ∘′ proj₂) (getAnn obsκs) ×
   All (uncurry BlameConsistent) (getAnn obsκs) ×
   All (SCtcSat (ℐconsistent i) tt ∘′ proj₂) (getAnn obsκs)
-AnnIntr.𝔹Sound     (ℐconsistent zero)    step inv inv′ mono ()
-AnnIntr.𝔹Sound     (ℐconsistent (suc i)) step inv inv′ mono (pmκs , bcs , κsats) =
+AnnInvr.𝔹Sound     (ℐconsistent zero)    step inv inv′ mono ()
+AnnInvr.𝔹Sound     (ℐconsistent (suc i)) step inv inv′ mono (pmκs , bcs , κsats) =
   pmκs ,′ bcs ,′ κsats
-AnnIntr.ℙ          (ℐconsistent i) obsκs ix◁ix′ em =
-  AnnIntr.𝔹 (ℐconsistent i) obsκs ix◁ix′ ⌊ em ⌋m
+AnnInvr.ℙ          (ℐconsistent i) obsκs ix◁ix′ em =
+  AnnInvr.𝔹 (ℐconsistent i) obsκs ix◁ix′ ⌊ em ⌋m
 
-ℐconsistency-monotonic : ∀ i → AnnTransitInterpIs (ℐconsistent i) Monotonic
+ℐconsistency-monotonic : ∀ i → AnnInvrIs (ℐconsistent i) Monotonic
 ℐconsistency-monotonic zero    tag step esat₁ termSat = tt , tt
 ℐconsistency-monotonic (suc i) tag step esat₁ termSat = tt , tt
 
-ℐconsistency-sound : ∀ i → AnnTransitInterpIs (ℐconsistent i) Sound
+ℐconsistency-sound : ∀ i → AnnInvrIs (ℐconsistent i) Sound
 ℐconsistency-sound zero `R-cross-unit
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit ())
   esat termSat inv′,mono

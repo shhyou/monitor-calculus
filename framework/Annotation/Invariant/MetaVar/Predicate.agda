@@ -1,13 +1,13 @@
 {-# OPTIONS --without-K --safe #-}
 
-module Annotation.Interpretation.MetaVar.Predicate where
+module Annotation.Invariant.MetaVar.Predicate where
 
 open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import Annotation.Language
-open import Annotation.Interpretation.Base
-open import Annotation.Interpretation.MetaVar.Base
+open import Annotation.Invariant.Base
+open import Annotation.Invariant.MetaVar.Base
 
 open import Relation.Binary.PropositionalEquality as PropEq
   using (_≡_; refl; cong)
@@ -33,7 +33,7 @@ private variable
   Γ : Ctxt
   τ : Ty
 
-record TermTmplPred (ℐ : AnnIntr {𝒜} 𝒯)
+record TermTmplPred (ℐ : AnnInvr {𝒜} 𝒯)
   : Set₁ where
   inductive; no-eta-equality
   open AnnTerm 𝒜
@@ -70,7 +70,7 @@ record TermTmplPred (ℐ : AnnIntr {𝒜} 𝒯)
       --------------------------------------------------
       MetaVarIxPred Ψ Δ (Ann ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ  ∋  B# a ⟪ eᵗ ⟫)
 
-varPred! : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {Ψ Δ Γ τ} →
+varPred! : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {Ψ Δ Γ τ} →
   (tmplPred : TermTmplPred ℐ) →
   (y : (Γ ,′ τ) ∈ Δ) →
   TermTmplPred.MetaVarIxPred tmplPred Ψ Δ (# y)
@@ -80,7 +80,7 @@ varPred! {Ψ = Ψ} {Δ} {Γ} {τ} tmplPred =
           (TermTmplPred.varPred? tmplPred))
   Ψ Δ Γ τ
 
-varPred!-just : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {Ψ Δ Γ τ} →
+varPred!-just : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {Ψ Δ Γ τ} →
   (tmplPred : TermTmplPred ℐ) →
   {varPred : ∀ Ψ Δ Γ τ →
     (y : (Γ ,′ τ) ∈ Δ) →
@@ -93,7 +93,7 @@ varPred!-just {Ψ = Ψ} {Δ} {Γ} {τ} tmplPred varPred?≡just
   Maybe.just-injective (cong (Maybe.map λ varPred″ → varPred″ Ψ Δ Γ τ)
                              varPred?≡just)
 
-varPred!-nothing : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {Ψ Δ Γ τ} →
+varPred!-nothing : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {Ψ Δ Γ τ} →
   (tmplPred : TermTmplPred ℐ) →
   TermTmplPred.varPred? tmplPred ≡ nothing →
   varPred! {Ψ = Ψ} {Δ} {Γ} {τ} tmplPred ≡ λ eᵗ {ϑ} p mvix ix* → ⊤
@@ -101,7 +101,7 @@ varPred!-nothing tmplPred varPred?≡nothing
   with TermTmplPred.varPred? tmplPred
 ... | nothing = refl
 
-TermTmplPred⇒MetaVarIxPred : {ℐ : AnnIntr {𝒜} 𝒯} →
+TermTmplPred⇒MetaVarIxPred : {ℐ : AnnInvr {𝒜} 𝒯} →
   (tmplPred : TermTmplPred ℐ) →
   (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} →

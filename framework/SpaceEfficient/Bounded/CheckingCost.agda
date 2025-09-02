@@ -43,7 +43,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 open import Annotation.Soundness
 
 open SpaceEfficient.Bounded.Base Label
@@ -68,21 +68,21 @@ Inv : State → Set
 Inv s =
   State.cost/chk s ≤ State.count s * check-bound ord-preds
 
-ℐchkbnd : AnnIntr 𝒯cntctc
-AnnIntr.Ix         ℐchkbnd = ⊤
-AnnIntr.IxRel      ℐchkbnd cκ ix ix′ = ⊤
-AnnIntr.Ord        ℐchkbnd = trivialOrd
-AnnIntr.isPreorder ℐchkbnd = trivialOrdIsPreorder
-AnnIntr.Inv        ℐchkbnd = Inv
-AnnIntr.𝔹          ℐchkbnd cκ ix◁ix′ e =
+ℐchkbnd : AnnInvr 𝒯cntctc
+AnnInvr.Ix         ℐchkbnd = ⊤
+AnnInvr.IxRel      ℐchkbnd cκ ix ix′ = ⊤
+AnnInvr.Ord        ℐchkbnd = trivialOrd
+AnnInvr.isPreorder ℐchkbnd = trivialOrdIsPreorder
+AnnInvr.Inv        ℐchkbnd = Inv
+AnnInvr.𝔹          ℐchkbnd cκ ix◁ix′ e =
   SECtcPreds (ord-preds ⊇#_) cκ
-AnnIntr.𝔹Sound     ℐchkbnd (R-redex step)            inv inv′ mono c#⊆U = c#⊆U
-AnnIntr.𝔹Sound     ℐchkbnd (R-bdr rule-no s s′ step) inv inv′ mono c#⊆U = c#⊆U
-AnnIntr.ℙ          ℐchkbnd cκ ix◁ix′ em =
-  AnnIntr.𝔹 ℐchkbnd cκ ix◁ix′ ⌊ em ⌋m
+AnnInvr.𝔹Sound     ℐchkbnd (R-redex step)            inv inv′ mono c#⊆U = c#⊆U
+AnnInvr.𝔹Sound     ℐchkbnd (R-bdr rule-no s s′ step) inv inv′ mono c#⊆U = c#⊆U
+AnnInvr.ℙ          ℐchkbnd cκ ix◁ix′ em =
+  AnnInvr.𝔹 ℐchkbnd cκ ix◁ix′ ⌊ em ⌋m
 
 
-ℐchkbnd-monotonic : AnnTransitInterpIs ℐchkbnd Monotonic
+ℐchkbnd-monotonic : AnnInvrIs ℐchkbnd Monotonic
 ℐchkbnd-monotonic `R-cross-unit {s₁ = s₁}
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
           (.s₁ , (s₁-status-eq , refl) , (.s₁ , refl , (.s₁ , refl , refl))))
@@ -197,7 +197,7 @@ AnnIntr.ℙ          ℐchkbnd cκ ix◁ix′ em =
     tt
 
 
-ℐchkbnd-sound : AnnTransitInterpIs ℐchkbnd Sound
+ℐchkbnd-sound : AnnInvrIs ℐchkbnd Sound
 ℐchkbnd-sound `R-cross-unit {s₁ = s₁}
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
           (.s₁ , (s₁-status-eq , refl) , (.s₁ , refl , (.s₁ , refl , refl))))

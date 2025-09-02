@@ -28,7 +28,7 @@ open import Syntax.Template
 open import OpSemantics.Base
 open import OpSemantics.TypeSafety
 open import Annotation.Language
-open import Annotation.Interpretation
+open import Annotation.Invariant
 open import Annotation.Soundness
 
 𝒜blame-sctc : AnnTerm
@@ -153,7 +153,7 @@ error-checking-frame {j = j} {bsκs = bsκs} {l = l}
     subst-check-nat-sctcs = subst check-nat-sctcs-ty (sym bsκs-eq) err-checkNatSCtcs
 
 
-nval-sat : ∀ {𝒜 𝒯 n} (ℐ : AnnIntr {𝒜} 𝒯) {ix} →
+nval-sat : ∀ {𝒜 𝒯 n} (ℐ : AnnInvr {𝒜} 𝒯) {ix} →
   (nval : ATAnn 𝒜 ∣ n isvalof `ℕ) →
   ℐ ⊨[ ix ] n
 nval-sat ℐ z/v        = `z

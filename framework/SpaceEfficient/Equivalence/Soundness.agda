@@ -53,7 +53,7 @@ open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
 open import OpSemantics.Properties
-open import Annotation.Interpretation
+open import Annotation.Invariant
 
 open SpaceEfficient.Equivalence.Base Label
 
@@ -65,7 +65,7 @@ open SpaceEfficient.OrderedPredicate Label 𝒜csctc
 open import SpaceEfficient.Base Label 𝒜csctc
 open import SpaceEfficient.Sign Label 𝒜csctc
 open import SpaceEfficient.Equivalence.OpSemantics Label (OrderedPredicate.stronger? OP)
-open import SpaceEfficient.Equivalence.Interpretation Label OP
+open import SpaceEfficient.Equivalence.Invariant Label OP
 open import SpaceEfficient.Equivalence.Simulation Label OP
 
 open AnnTerm 𝒜csctc using (Ann; State)
@@ -73,7 +73,7 @@ open OrderedPredicate OP renaming (isPartialOrder to opIsPartialOrder)
 open SECtcTransitSteps 𝒜cctc-view stronger?
 
 
-ℐsim-monotonic : AnnTransitInterpIs ℐsim Monotonic
+ℐsim-monotonic : AnnInvrIs ℐsim Monotonic
 ℐsim-monotonic `R-cross-unit
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
           trWit@(s* , (refl , refl) , (refl , refl)))
@@ -178,7 +178,7 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
   rewrite Vec.cast-is-id refl (Vec.fromList sκs′) =
   subst (CollapsedCtcs (length sκs′) cκ) (sym sκs-eq) clc
 
-ℐsim-sound : AnnTransitInterpIs ℐsim Sound
+ℐsim-sound : AnnInvrIs ℐsim Sound
 ℐsim-sound `R-cross-unit
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit trWit)
   esat termSat inv′,mono = record

@@ -1,12 +1,12 @@
 {-# OPTIONS --without-K --safe #-}
 
-module Annotation.Interpretation.MetaVar.Base where
+module Annotation.Invariant.MetaVar.Base where
 
 open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import Annotation.Language
-open import Annotation.Interpretation.Base
+open import Annotation.Invariant.Base
 
 open import Relation.Binary.PropositionalEquality as PropEq
   using (_≡_; refl)
@@ -28,13 +28,13 @@ private variable
   Γ : Ctxt
   τ τ₁ τ₂ : Ty
 
-VarIx : (ℐ : AnnIntr {𝒜} 𝒯) → (Δ : List (Ctxt × Ty)) → Set
+VarIx : (ℐ : AnnInvr {𝒜} 𝒯) → (Δ : List (Ctxt × Ty)) → Set
 VarIx ℐ Δ = ∀ {x} → (y : x ∈ Δ) → AIIx ℐ
 
-AnnIx : (ℐ : AnnIntr {𝒜} 𝒯) → (Ψ : List Ty) → Set
+AnnIx : (ℐ : AnnInvr {𝒜} 𝒯) → (Ψ : List Ty) → Set
 AnnIx ℐ Ψ = ∀ {τ} → (a : τ ∈ Ψ) → AIIx ℐ
 
-record MetaVarIx (ℐ : AnnIntr {𝒜} 𝒯) (ϑ : MetaVar (ATAnn 𝒜) Ψ Δ) : Set where
+record MetaVarIx (ℐ : AnnInvr {𝒜} 𝒯) (ϑ : MetaVar (ATAnn 𝒜) Ψ Δ) : Set where
     inductive; no-eta-equality; pattern
     constructor mkMVIx
     field
@@ -43,7 +43,7 @@ record MetaVarIx (ℐ : AnnIntr {𝒜} 𝒯) (ϑ : MetaVar (ATAnn 𝒜) Ψ Δ) :
       annIxᵗ : AnnIx ℐ Ψ
 open MetaVarIx public
 
-MetaVarSat : (ℐ : AnnIntr {𝒜} 𝒯) → MEnv (ATAnn 𝒜) Δ → VarIx ℐ Δ → Set
+MetaVarSat : (ℐ : AnnInvr {𝒜} 𝒯) → MEnv (ATAnn 𝒜) Δ → VarIx ℐ Δ → Set
 MetaVarSat {Δ = Δ} ℐ termEnv varIx = ∀ {x} → (y : x ∈ Δ) → ℐ ⊨[ varIx y ] termEnv y
 
 [ix↦_] : {A : Set} → A → ∀ {τ′} → (a : τ′ ∈ (τ ∷ [])) → A

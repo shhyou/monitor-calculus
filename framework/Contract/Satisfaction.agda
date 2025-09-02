@@ -16,7 +16,7 @@ open import Data.List.Membership.Propositional using (_∈_)
 
 open import Syntax.Type
 open import Syntax.Term
-open import Annotation.Interpretation.Base
+open import Annotation.Invariant.Base
 open import Contract.Base Label 𝒜
 
 open AnnTerm 𝒜 using (Ann; State)
@@ -27,7 +27,7 @@ private variable
 
   𝒯 : AnnTransit 𝒜
 
-data SCtcSat {𝒯} (ℐ : AnnIntr {𝒜} 𝒯) (ix : AIIx ℐ) : ∀ {Δ τ} → SCtc1N Δ τ → Set where
+data SCtcSat {𝒯} (ℐ : AnnInvr {𝒜} 𝒯) (ix : AIIx ℐ) : ∀ {Δ τ} → SCtc1N Δ τ → Set where
   `_ : ∀ a →
     SCtcSat ℐ ix {Δ} (` a)
   1/s :
@@ -54,7 +54,7 @@ data SCtcSat {𝒯} (ℐ : AnnIntr {𝒜} 𝒯) (ix : AIIx ℐ) : ∀ {Δ τ} �
     SCtcSat ℐ ix           sκ →
     SCtcSat ℐ ix {Δ} {μ τ} (μ/c sκ)
 
-sκsatrename : ∀ {ℐ : AnnIntr 𝒯} {ix} →
+sκsatrename : ∀ {ℐ : AnnInvr 𝒯} {ix} →
   {sκ : SCtc1N Δ τ} →
   SCtcSat ℐ ix sκ →
   (ren : tt ∈ Δ → tt ∈ Δ′) →
@@ -68,7 +68,7 @@ sκsatrename (box/s sκsat)       ren = box/s (sκsatrename sκsat ren)
 sκsatrename (sκsatₐ →/s sκsatᵣ) ren = sκsatrename sκsatₐ ren →/s sκsatrename sκsatᵣ ren
 sκsatrename (μ/s sκsat)         ren = μ/s (sκsatrename sκsat (pext ren))
 
-sκsatext : ∀ {ℐ : AnnIntr 𝒯} {ix} →
+sκsatext : ∀ {ℐ : AnnInvr 𝒯} {ix} →
   {σ : tt ∈ Δ → TyN Δ′} →
   {σκ : (a : tt ∈ Δ) → SCtc1N Δ′ (σ a)} →
   (σs : (a : tt ∈ Δ) → SCtcSat ℐ ix (σκ a)) →
@@ -76,7 +76,7 @@ sκsatext : ∀ {ℐ : AnnIntr 𝒯} {ix} →
 sκsatext σs (here refl)  = ` here refl
 sκsatext σs (there x∈Δ) = sκsatrename (σs x∈Δ) there
 
-sκsatsubst : ∀ {ℐ : AnnIntr 𝒯} {ix} →
+sκsatsubst : ∀ {ℐ : AnnInvr 𝒯} {ix} →
   {σ : tt ∈ Δ → TyN Δ′} →
   {σκ : (a : tt ∈ Δ) → SCtc1N Δ′ (σ a)} →
   {sκ : SCtc1N Δ τ} →
@@ -93,7 +93,7 @@ sκsatsubst (sκsatₐ →/s sκsatᵣ) σs = sκsatsubst sκsatₐ σs →/s s�
 sκsatsubst (μ/s sκsat)         σs = μ/s (sκsatsubst sκsat (sκsatext σs))
 
 
-sκsat0mapsto [sκsat0↦_] : ∀ {ℐ : AnnIntr 𝒯} {ix} {sκ : SCtc1N Δ τ} →
+sκsat0mapsto [sκsat0↦_] : ∀ {ℐ : AnnInvr 𝒯} {ix} {sκ : SCtc1N Δ τ} →
   SCtcSat ℐ ix {Δ} sκ →
   (a : tt ∈ (tt ∷ Δ)) →
   SCtcSat ℐ ix {Δ} ([sκ0↦ sκ ] a)
@@ -103,35 +103,35 @@ sκsat0mapsto sκsat (there x∈Δ) = ` x∈Δ
 [sκsat0↦_] = sκsat0mapsto
 
 
-sκsat-*₁ : ∀ {ℐ : AnnIntr 𝒯} {ix sκ} →
+sκsat-*₁ : ∀ {ℐ : AnnInvr 𝒯} {ix sκ} →
   SCtcSat ℐ ix {Δ} {τ₁ `* τ₂} sκ → SCtcSat ℐ ix (*/c-sκ₁ sκ)
 sκsat-*₁ (sκsat₁ */s sκsat₂) = sκsat₁
 
-sκsat-*₂ : ∀ {ℐ : AnnIntr 𝒯} {ix sκ} →
+sκsat-*₂ : ∀ {ℐ : AnnInvr 𝒯} {ix sκ} →
   SCtcSat ℐ ix {Δ} {τ₁ `* τ₂} sκ → SCtcSat ℐ ix (*/c-sκ₂ sκ)
 sκsat-*₂ (sκsat₁ */s sκsat₂) = sκsat₂
 
-sκsat-+₁ : ∀ {ℐ : AnnIntr 𝒯} {ix sκ} →
+sκsat-+₁ : ∀ {ℐ : AnnInvr 𝒯} {ix sκ} →
   SCtcSat ℐ ix {Δ} {τ₁ `+ τ₂} sκ → SCtcSat ℐ ix (+/c-sκ₁ sκ)
 sκsat-+₁ (sκsat₁ +/s sκsat₂) = sκsat₁
 
-sκsat-+₂ : ∀ {ℐ : AnnIntr 𝒯} {ix sκ} →
+sκsat-+₂ : ∀ {ℐ : AnnInvr 𝒯} {ix sκ} →
   SCtcSat ℐ ix {Δ} {τ₁ `+ τ₂} sκ → SCtcSat ℐ ix (+/c-sκ₂ sκ)
 sκsat-+₂ (sκsat₁ +/s sκsat₂) = sκsat₂
 
-sκsat-box : ∀ {ℐ : AnnIntr 𝒯} {ix sκ} →
+sκsat-box : ∀ {ℐ : AnnInvr 𝒯} {ix sκ} →
   SCtcSat ℐ ix {Δ} {Box τ} sκ → SCtcSat ℐ ix (box/c-sκ sκ)
 sκsat-box (box/s sκsat) = sκsat
 
-sκsat-dom : ∀ {ℐ : AnnIntr 𝒯} {ix sκ} →
+sκsat-dom : ∀ {ℐ : AnnInvr 𝒯} {ix sκ} →
   SCtcSat ℐ ix {Δ} {τₐ `→ τᵣ} sκ → SCtcSat ℐ ix (→/c-dom-sκ sκ)
 sκsat-dom (sκsatₐ →/s sκsatᵣ) = sκsatₐ
 
-sκsat-rng : ∀ {ℐ : AnnIntr 𝒯} {ix sκ} →
+sκsat-rng : ∀ {ℐ : AnnInvr 𝒯} {ix sκ} →
   SCtcSat ℐ ix {Δ} {τₐ `→ τᵣ} sκ → SCtcSat ℐ ix (→/c-rng-sκ sκ)
 sκsat-rng (sκsatₐ →/s sκsatᵣ) = sκsatᵣ
 
-sκsat-μ : ∀ {ℐ : AnnIntr 𝒯} {ix sκ} →
+sκsat-μ : ∀ {ℐ : AnnInvr 𝒯} {ix sκ} →
   SCtcSat ℐ ix {Δ} {μ τ} sκ →
   SCtcSat ℐ ix (μ/c-sκ sκ)
 sκsat-μ (μ/s sκsat) = sκsatsubst sκsat [sκsat0↦ μ/s sκsat ]

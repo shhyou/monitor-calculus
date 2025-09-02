@@ -27,7 +27,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 
 open import Contract.Common Label
 open import Contract.Base Label 𝒜 as StdCtc
@@ -57,15 +57,15 @@ module _ (𝒜view : AnnTermView 𝒜 𝒜sctc) where
                         ; trans = em-trans
                         }
 
-  ℐerrmono : ∀ 𝒯 → AnnIntr {𝒜} 𝒯
-  AnnIntr.Ix         (ℐerrmono 𝒯) = ⊤
-  AnnIntr.IxRel      (ℐerrmono 𝒯) A ix ix′ = ⊤
-  AnnIntr.Inv        (ℐerrmono 𝒯) s = ⊤
-  AnnIntr.Ord        (ℐerrmono 𝒯) = ErrMono
-  AnnIntr.isPreorder (ℐerrmono 𝒯) = emIsPreorder
-  AnnIntr.𝔹          (ℐerrmono 𝒯) A ix◁ix′ e = ⊤
-  AnnIntr.𝔹Sound     (ℐerrmono 𝒯) step inv inv′ mono bsat = tt
-  AnnIntr.ℙ          (ℐerrmono 𝒯) {τ = τ} A ix◁ix′ em = ⊤
+  ℐerrmono : ∀ 𝒯 → AnnInvr {𝒜} 𝒯
+  AnnInvr.Ix         (ℐerrmono 𝒯) = ⊤
+  AnnInvr.IxRel      (ℐerrmono 𝒯) A ix ix′ = ⊤
+  AnnInvr.Inv        (ℐerrmono 𝒯) s = ⊤
+  AnnInvr.Ord        (ℐerrmono 𝒯) = ErrMono
+  AnnInvr.isPreorder (ℐerrmono 𝒯) = emIsPreorder
+  AnnInvr.𝔹          (ℐerrmono 𝒯) A ix◁ix′ e = ⊤
+  AnnInvr.𝔹Sound     (ℐerrmono 𝒯) step inv inv′ mono bsat = tt
+  AnnInvr.ℙ          (ℐerrmono 𝒯) {τ = τ} A ix◁ix′ em = ⊤
 
   checkNatSCtcsMono : ∀ 𝒯 {n s s′} →
     (sκs : List (SCtc1N [] `ℕ)) →
@@ -88,7 +88,7 @@ module _ (𝒜view : AnnTermView 𝒜 𝒜sctc) where
     (s′ , inj₂ (l′ , s≡Err , s≡s′-full@refl) , checks-tr)
     = checkNatSCtcsMono 𝒯 sκs checks-tr
 
-  ℐerrmono-monotonic : ∀ 𝒯 → AnnTransitInterpIs (ℐerrmono (𝒯sctc 𝒜view 𝒯)) Monotonic
+  ℐerrmono-monotonic : ∀ 𝒯 → AnnInvrIs (ℐerrmono (𝒯sctc 𝒜view 𝒯)) Monotonic
   ℐerrmono-monotonic 𝒯 `R-cross-unit
     (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
       trWit@(s-eq , s≡s′@refl))
@@ -162,7 +162,7 @@ module _ (𝒜view : AnnTermView 𝒜 𝒜sctc) where
     termSat =
       _ , em-refl refl
 
-  ℐerrmono-sound : ∀ 𝒯 → AnnTransitInterpIs (ℐerrmono (𝒯sctc 𝒜view 𝒯)) Sound
+  ℐerrmono-sound : ∀ 𝒯 → AnnInvrIs (ℐerrmono (𝒯sctc 𝒜view 𝒯)) Sound
   ℐerrmono-sound 𝒯 `R-cross-unit
     (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
       trWit@(s-eq , s≡s′@refl))

@@ -26,7 +26,7 @@ open import Annotation.Language
 open import Syntax.Template
 open import OpSemantics.Base
 open import OpSemantics.TypeSafety
-open import Annotation.Interpretation
+open import Annotation.Invariant
 open import Annotation.Soundness
 
 𝒜ctc : AnnTerm
@@ -40,7 +40,7 @@ open import Example.SimpleContract.ExtensibleAnnotation 𝒜ctc Pred⟦_⟧
   hiding (𝒜ctc)
 open import Example.FirstOrder.FirstOrderTy 𝒜ctc
 open import Example.FirstOrder.FlatBoundaryExpr 𝒜ctc
-open import Example.FirstOrder.Interpretation 𝒜ctc
+open import Example.FirstOrder.Invariant 𝒜ctc
 
 AnnTerm.Ann   𝒜ctc τ = CtcN [] τ
 AnnTerm.State 𝒜ctc   = Status

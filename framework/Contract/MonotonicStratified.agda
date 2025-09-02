@@ -29,7 +29,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 
 𝒜ctc : AnnTerm
 
@@ -46,22 +46,22 @@ AnnTerm.State 𝒜ctc   = Status
 𝒯 (suc i) = 𝒯sctc id𝒜view (𝒯 i)
 
 
-ℐerrmono* : (i : ℕ) → AnnIntr (𝒯 i)
-AnnIntr.Ix         (ℐerrmono* i) = ⊤
-AnnIntr.IxRel      (ℐerrmono* i) sκs ix ix′ = ⊤
-AnnIntr.Inv        (ℐerrmono* i) s = ⊤
-AnnIntr.Ord        (ℐerrmono* i) = ErrMono id𝒜view
-AnnIntr.isPreorder (ℐerrmono* i) = emIsPreorder id𝒜view
-AnnIntr.𝔹          (ℐerrmono* zero) sκs ix◁ix′ e = ⊥
-AnnIntr.𝔹          (ℐerrmono* (suc i)) sκs ix◁ix′ e =
+ℐerrmono* : (i : ℕ) → AnnInvr (𝒯 i)
+AnnInvr.Ix         (ℐerrmono* i) = ⊤
+AnnInvr.IxRel      (ℐerrmono* i) sκs ix ix′ = ⊤
+AnnInvr.Inv        (ℐerrmono* i) s = ⊤
+AnnInvr.Ord        (ℐerrmono* i) = ErrMono id𝒜view
+AnnInvr.isPreorder (ℐerrmono* i) = emIsPreorder id𝒜view
+AnnInvr.𝔹          (ℐerrmono* zero) sκs ix◁ix′ e = ⊥
+AnnInvr.𝔹          (ℐerrmono* (suc i)) sκs ix◁ix′ e =
   All (SCtcSat (ℐerrmono* i) tt) sκs
-AnnIntr.𝔹Sound     (ℐerrmono* zero) step inv inv′ mono ()
-AnnIntr.𝔹Sound     (ℐerrmono* (suc i)) {A = sκs} step inv inv′ mono bsat = bsat
-AnnIntr.ℙ          (ℐerrmono* i) {τ = τ} sκs ix◁ix′ em =
-  AnnIntr.𝔹 (ℐerrmono* i) {τ = τ} sκs ix◁ix′ ⌊ em ⌋m
+AnnInvr.𝔹Sound     (ℐerrmono* zero) step inv inv′ mono ()
+AnnInvr.𝔹Sound     (ℐerrmono* (suc i)) {A = sκs} step inv inv′ mono bsat = bsat
+AnnInvr.ℙ          (ℐerrmono* i) {τ = τ} sκs ix◁ix′ em =
+  AnnInvr.𝔹 (ℐerrmono* i) {τ = τ} sκs ix◁ix′ ⌊ em ⌋m
 
 
-ℐerrmono*-monotonic : ∀ i → AnnTransitInterpIs (ℐerrmono* i) Monotonic
+ℐerrmono*-monotonic : ∀ i → AnnInvrIs (ℐerrmono* i) Monotonic
 ℐerrmono*-monotonic zero `R-cross-unit
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit ())
   esat termSat
@@ -173,7 +173,7 @@ AnnIntr.ℙ          (ℐerrmono* i) {τ = τ} sκs ix◁ix′ em =
     _ , em-refl refl
 
 
-ℐerrmono*-sound : ∀ i → AnnTransitInterpIs (ℐerrmono* i) Sound
+ℐerrmono*-sound : ∀ i → AnnInvrIs (ℐerrmono* i) Sound
 ℐerrmono*-sound zero `R-cross-unit
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit ())
   esat termSat inv′,mono

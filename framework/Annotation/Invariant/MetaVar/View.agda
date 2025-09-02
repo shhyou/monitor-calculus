@@ -1,15 +1,15 @@
 {-# OPTIONS --without-K --safe --no-infer-absurd-clauses #-}
 
-module Annotation.Interpretation.MetaVar.View where
+module Annotation.Invariant.MetaVar.View where
 
 open import Utils.Misc
 open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import Annotation.Language
-open import Annotation.Interpretation.Base
-open import Annotation.Interpretation.MetaVar.Base
-open import Annotation.Interpretation.MetaVar.Predicate
+open import Annotation.Invariant.Base
+open import Annotation.Invariant.MetaVar.Base
+open import Annotation.Invariant.MetaVar.Predicate
 
 open import Relation.Binary.PropositionalEquality as PropEq
   using (_≡_; refl; subst; cong; sym; trans)
@@ -39,7 +39,7 @@ private variable
   τ : Ty
 
 
-record MVIxPredView {ℐ : AnnIntr {𝒜} 𝒯}
+record MVIxPredView {ℐ : AnnInvr {𝒜} 𝒯}
   (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ)
   (tmplPred : TermTmplPred ℐ)
   : Set₁ where
@@ -60,7 +60,7 @@ MVIxPredHasView 𝒜 R =
   let open Rule R in
   (tyvars : TyVars) →
   let open PreRule (mkPreRule tyvars) in
-  ∀ {𝒯} {ℐ : AnnIntr {𝒜} 𝒯} →
+  ∀ {𝒯} {ℐ : AnnInvr {𝒜} 𝒯} →
     (tmplPred : TermTmplPred ℐ) →
     MVIxPredView (exprᵗ termTmpl₁) tmplPred ×
     MVIxPredView (exprᵗ termTmpl₂) tmplPred

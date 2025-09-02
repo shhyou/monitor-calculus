@@ -1,14 +1,14 @@
 {-# OPTIONS --without-K --safe #-}
 
-module Annotation.Interpretation.MetaVar.Extract where
+module Annotation.Invariant.MetaVar.Extract where
 
 open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import Annotation.Language
-open import Annotation.Interpretation.Base
-open import Annotation.Interpretation.MetaVar.Base
-open import Annotation.Interpretation.MetaVar.BoundaryPredicate
+open import Annotation.Invariant.Base
+open import Annotation.Invariant.MetaVar.Base
+open import Annotation.Invariant.MetaVar.BoundaryPredicate
 
 open import Relation.Binary.PropositionalEquality as PropEq
   using (_≡_; refl; subst; cong; sym; trans)
@@ -35,7 +35,7 @@ MetaVarExtractible 𝒜 R =
   let open Rule R in
   (tyvars : TyVars) →
   let e₁ = exprᵗ (prTermTmpl₁ (mkPreRule tyvars)) in
-  ∀ {𝒯} {ℐ : AnnIntr {𝒜} 𝒯} {ix₀ ϑ} →
+  ∀ {𝒯} {ℐ : AnnInvr {𝒜} 𝒯} {ix₀ ϑ} →
     (esat₁ : (ℐ ⊨[ ix₀ ] esubstᵗ e₁ ϑ)) →
     Σ[ mvix ∈  MetaVarIx ℐ ϑ ]
       IsSatIx e₁ (ix₀ , esat₁) mvix ix₀ ×

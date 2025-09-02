@@ -40,7 +40,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 
 open Blame.Base Label hiding (module AnnBlameContractLang)
 open import Contract.Common Label
@@ -95,30 +95,30 @@ reverseᵇ {bs = .b ∷ bs} (b ∷ bs′)
   rewrite List.unfold-reverse (blame-swap b) (map blame-swap bs)
   = reverseᵇ bs′ ++ᵇ (blame-swap b ∷ [])
 
-SCtcSat′ : ∀ {𝒯} (ℐ : AnnIntr 𝒯) {τ} → SCtc1N [] τ → Set
+SCtcSat′ : ∀ {𝒯} (ℐ : AnnInvr 𝒯) {τ} → SCtc1N [] τ → Set
 SCtcSat′ ℐ sκ = ∃[ j ] SCtcSat ℐ j sκ
 
-ℐowner : (i : ℕ) → AnnIntr (𝒯 i)
-AnnIntr.Ix         (ℐowner i) = Label
-AnnIntr.IxRel      (ℐowner i) obsκs ix ix′ = BlameSeq ix′ ix (getBlameObj obsκs)
-AnnIntr.Inv        (ℐowner i) s = ⊤
-AnnIntr.Ord        (ℐowner i) = trivialOrd
-AnnIntr.isPreorder (ℐowner i) = trivialOrdIsPreorder
-AnnIntr.𝔹          (ℐowner zero)    obsκs ix◁ix′ e = ⊥
-AnnIntr.𝔹          (ℐowner (suc i)) obsκs {ix = ix} {ix′} ix◁ix′ e =
+ℐowner : (i : ℕ) → AnnInvr (𝒯 i)
+AnnInvr.Ix         (ℐowner i) = Label
+AnnInvr.IxRel      (ℐowner i) obsκs ix ix′ = BlameSeq ix′ ix (getBlameObj obsκs)
+AnnInvr.Inv        (ℐowner i) s = ⊤
+AnnInvr.Ord        (ℐowner i) = trivialOrd
+AnnInvr.isPreorder (ℐowner i) = trivialOrdIsPreorder
+AnnInvr.𝔹          (ℐowner zero)    obsκs ix◁ix′ e = ⊥
+AnnInvr.𝔹          (ℐowner (suc i)) obsκs {ix = ix} {ix′} ix◁ix′ e =
   (ix , ix′) ≡ getOwner obsκs ×
   All (SCtcSat′ (ℐowner i) ∘ proj₂) (getBSCtc obsκs)
-AnnIntr.𝔹Sound     (ℐowner zero)    step inv inv′ mono ()
-AnnIntr.𝔹Sound     (ℐowner (suc i)) step inv inv′ mono (bs-own-eq , j-κsats) =
+AnnInvr.𝔹Sound     (ℐowner zero)    step inv inv′ mono ()
+AnnInvr.𝔹Sound     (ℐowner (suc i)) step inv inv′ mono (bs-own-eq , j-κsats) =
   bs-own-eq ,′ j-κsats
-AnnIntr.ℙ          (ℐowner i) obsκs ix◁ix′ em =
-  AnnIntr.𝔹 (ℐowner i) obsκs ix◁ix′ ⌊ em ⌋m
+AnnInvr.ℙ          (ℐowner i) obsκs ix◁ix′ em =
+  AnnInvr.𝔹 (ℐowner i) obsκs ix◁ix′ ⌊ em ⌋m
 
-ℐowner-monotonic : ∀ i → AnnTransitInterpIs (ℐowner i) Monotonic
+ℐowner-monotonic : ∀ i → AnnInvrIs (ℐowner i) Monotonic
 ℐowner-monotonic zero    tag step esat₁ termSat = tt , tt
 ℐowner-monotonic (suc i) tag step esat₁ termSat = tt , tt
 
-ℐowner-sound : ∀ i → AnnTransitInterpIs (ℐowner i) Sound
+ℐowner-sound : ∀ i → AnnInvrIs (ℐowner i) Sound
 ℐowner-sound zero `R-cross-unit
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit ())
   esat termSat inv′,mono

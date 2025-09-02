@@ -8,7 +8,7 @@ open import SpaceEfficient.OrderedPredicate
   using ()
   renaming (OrderedPredicate to SEOrderedPredicate)
 
-module SpaceEfficient.Equivalence.Interpretation
+module SpaceEfficient.Equivalence.Invariant
   (Label : Set)
   (OP : SEOrderedPredicate  Label (SE𝒜csctc Label)
                             (AnnTermView.getState (SE𝒜sctc-view Label))
@@ -44,7 +44,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import OpSemantics.Base
 open import OpSemantics.Properties
-open import Annotation.Interpretation.Base
+open import Annotation.Invariant.Base
 
 open SpaceEfficient.Equivalence.Base Label
 
@@ -177,16 +177,16 @@ check-nat-ctc-sim (_ ∷ sκ-preds) nv ok-preds (⟨ oe@(e , e∈opreds) , oe′
 
 
 
-ℐsim : AnnIntr 𝒯csctc
-AnnIntr.Ix         ℐsim = ⊤
-AnnIntr.IxRel      ℐsim csκs ix ix′ = ⊤
-AnnIntr.Inv        ℐsim = is-diagonal
-AnnIntr.Ord        ℐsim = SimOrd
-AnnIntr.isPreorder ℐsim = soIsPreorder
-AnnIntr.𝔹          ℐsim csκs ix◁ix′ e =
+ℐsim : AnnInvr 𝒯csctc
+AnnInvr.Ix         ℐsim = ⊤
+AnnInvr.IxRel      ℐsim csκs ix ix′ = ⊤
+AnnInvr.Inv        ℐsim = is-diagonal
+AnnInvr.Ord        ℐsim = SimOrd
+AnnInvr.isPreorder ℐsim = soIsPreorder
+AnnInvr.𝔹          ℐsim csκs ix◁ix′ e =
   SECtcSigned pos [] (proj₁ csκs) ×
   CollapsedCtcs (length (proj₂ csκs)) (proj₁ csκs) (Vec.fromList (proj₂ csκs))
-AnnIntr.𝔹Sound     ℐsim (R-redex step)            inv inv′ mono (pmκ , c⊆s) = pmκ ,′ c⊆s
-AnnIntr.𝔹Sound     ℐsim (R-bdr rule-no s s′ step) inv inv′ mono (pmκ , c⊆s) = pmκ ,′ c⊆s
-AnnIntr.ℙ          ℐsim csκs ix◁ix′ em =
-  AnnIntr.𝔹 ℐsim csκs ix◁ix′ ⌊ em ⌋m
+AnnInvr.𝔹Sound     ℐsim (R-redex step)            inv inv′ mono (pmκ , c⊆s) = pmκ ,′ c⊆s
+AnnInvr.𝔹Sound     ℐsim (R-bdr rule-no s s′ step) inv inv′ mono (pmκ , c⊆s) = pmκ ,′ c⊆s
+AnnInvr.ℙ          ℐsim csκs ix◁ix′ em =
+  AnnInvr.𝔹 ℐsim csκs ix◁ix′ ⌊ em ⌋m

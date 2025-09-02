@@ -44,7 +44,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 
 open import Contract.Common Label
 open import Contract.Base Label 𝒜
@@ -66,22 +66,22 @@ open AnnTerm 𝒜 hiding (State)
 open AnnTermView 𝒜cctc-view using (getAnn)
 open SECtcTransitSteps 𝒜cctc-view stronger?
 
-ℐsize : (c : ℕ) → AnnIntr 𝒯cctc
-AnnIntr.Ix         (ℐsize _) = ℕ
-AnnIntr.IxRel      (ℐsize c) A ix ix′ = c ≡ ix × c ≡ ix′
-AnnIntr.Ord        (ℐsize _) = trivialOrd
-AnnIntr.isPreorder (ℐsize _) = trivialOrdIsPreorder
-AnnIntr.Inv        (ℐsize _) s = ⊤
-AnnIntr.𝔹          (ℐsize _) A {ix = c} ix◁ix′ e =
+ℐsize : (c : ℕ) → AnnInvr 𝒯cctc
+AnnInvr.Ix         (ℐsize _) = ℕ
+AnnInvr.IxRel      (ℐsize c) A ix ix′ = c ≡ ix × c ≡ ix′
+AnnInvr.Ord        (ℐsize _) = trivialOrd
+AnnInvr.isPreorder (ℐsize _) = trivialOrdIsPreorder
+AnnInvr.Inv        (ℐsize _) s = ⊤
+AnnInvr.𝔹          (ℐsize _) A {ix = c} ix◁ix′ e =
   SECtcNonRecursive cκ ×
   SECtcPreds (ord-preds ⊇#_) cκ ×
   SECtcMaxH cκ H ×
   sectc-size cκ ≤ c * 2 ^ H * length ord-preds
   where cκ = getAnn A
-AnnIntr.𝔹Sound     (ℐsize _) (R-redex step)        inv inv′ mono cnr,c#⊆U,cmh,bnd = cnr,c#⊆U,cmh,bnd
-AnnIntr.𝔹Sound     (ℐsize _) (R-bdr tag s s′ step) inv inv′ mono cnr,c#⊆U,cmh,bnd = cnr,c#⊆U,cmh,bnd
-AnnIntr.ℙ          (ℐsize c) A ix◁ix′ em =
-  AnnIntr.𝔹 (ℐsize c) A ix◁ix′ ⌊ em ⌋m
+AnnInvr.𝔹Sound     (ℐsize _) (R-redex step)        inv inv′ mono cnr,c#⊆U,cmh,bnd = cnr,c#⊆U,cmh,bnd
+AnnInvr.𝔹Sound     (ℐsize _) (R-bdr tag s s′ step) inv inv′ mono cnr,c#⊆U,cmh,bnd = cnr,c#⊆U,cmh,bnd
+AnnInvr.ℙ          (ℐsize c) A ix◁ix′ em =
+  AnnInvr.𝔹 (ℐsize c) A ix◁ix′ ⌊ em ⌋m
 
 
 USublist⇒BoundedLen : ∀ {Δ τ cκ} →
@@ -96,10 +96,10 @@ c₀ = proj₁ sectc-bounded
 sectc-is-bounded = proj₂ (proj₂ sectc-bounded)
 1≤|ord-preds| = IsNonEmpty-length ord-preds-nonempty
 
-ℐsize-monotonic : AnnTransitInterpIs (ℐsize c₀) Monotonic
+ℐsize-monotonic : AnnInvrIs (ℐsize c₀) Monotonic
 ℐsize-monotonic tag step esat₁ termSat = tt , tt
 
-ℐsize-sound : AnnTransitInterpIs (ℐsize c₀) Sound
+ℐsize-sound : AnnInvrIs (ℐsize c₀) Sound
 ℐsize-sound `R-cross-unit {s₁ = s₁}
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
           (s₁-status-eq , refl))

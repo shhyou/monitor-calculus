@@ -27,23 +27,23 @@ import OpSemantics.TypeSafety
 import OpSemantics.Properties
 
 -- Section 4: Invariant, its properties (monotonicity and soundness), and simplified proof goals
-import Annotation.Interpretation
-import Annotation.Interpretation.Base
-import Annotation.Interpretation.MetaVar.Base
-import Annotation.Interpretation.MetaVar.Predicate
-import Annotation.Interpretation.MetaVar.BoundaryPredicate
-import Annotation.Interpretation.MetaVar.ExpandedBoundaryPredicate
-import Annotation.Interpretation.MetaVar.Extract
-import Annotation.Interpretation.MetaVar.View
-import Annotation.Interpretation.MetaVar
-import Annotation.Interpretation.Decompose
-import Annotation.Interpretation.Property
+import Annotation.Invariant
+import Annotation.Invariant.Base
+import Annotation.Invariant.MetaVar.Base
+import Annotation.Invariant.MetaVar.Predicate
+import Annotation.Invariant.MetaVar.BoundaryPredicate
+import Annotation.Invariant.MetaVar.ExpandedBoundaryPredicate
+import Annotation.Invariant.MetaVar.Extract
+import Annotation.Invariant.MetaVar.View
+import Annotation.Invariant.MetaVar
+import Annotation.Invariant.Decompose
+import Annotation.Invariant.Property
 -- Soundness of invariant
 import Annotation.Soundness
 
 -- Two example invariants
-import Example.Empty.Interpretation
-import Example.ProxyVal.Interpretation
+import Example.Empty.Invariant
+import Example.ProxyVal.Invariant
 
 -- The trivial annotation language, and that there is an instance projection
 -- from any annotation language to the trivial language.
@@ -51,7 +51,7 @@ import Example.Unit.Annotation
 
 -- An example annotation language: counting the number of monitor-related reduction steps
 import Example.Count.Annotation
-import Example.Count.NonDecreasingInterpretation
+import Example.Count.NonDecreasingInvariant
 
 -- A simple contract annotation language which assumes that the wrappers do not accumulate
 import Example.SimpleContract.ClosedAnnotation
@@ -65,7 +65,7 @@ import Example.SimpleContract.Progress
 -- a first-order value (e.g., a first-order function).
 import Example.FirstOrder.FirstOrderTy
 import Example.FirstOrder.FlatBoundaryExpr
-import Example.FirstOrder.Interpretation
+import Example.FirstOrder.Invariant
 
 -- Section 2: Findler-Felleisen contracts
 import Contract.Common
@@ -114,6 +114,6 @@ import SpaceEfficient.Bounded
 import SpaceEfficient.Equivalence.Base
 import SpaceEfficient.Equivalence.OpSemantics
 import SpaceEfficient.Equivalence.Simulation
-import SpaceEfficient.Equivalence.Interpretation
+import SpaceEfficient.Equivalence.Invariant
 import SpaceEfficient.Equivalence.Soundness
 import SpaceEfficient.Equivalence

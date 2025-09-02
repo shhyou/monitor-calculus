@@ -7,8 +7,8 @@ open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
 open import Annotation.Language
-open import Annotation.Interpretation
-open import Annotation.Interpretation.MetaVar.Extract
+open import Annotation.Invariant
+open import Annotation.Invariant.MetaVar.Extract
 
 open import Relation.Binary.Structures as RelStruct
   using (IsPreorder; IsEquivalence)
@@ -37,7 +37,7 @@ private variable
   τ τ′ τₐ τᵣ τ₁ τ₂ : Ty
 
 monotonicity-ctxt :
-  (ℐ : AnnIntr {𝒜} 𝒯) →
+  (ℐ : AnnInvr {𝒜} 𝒯) →
   (∀ {τᵣ ix s s′} {eᵣ eᵣ′ : ATAnn 𝒜 ∣ [] ⊢ τᵣ} →
     Rel s eᵣ s′ eᵣ′ →
     (I : AIInv ℐ s) →
@@ -88,10 +88,10 @@ monotonicity-ctxt ℐ base-mono (RC-seq step) inv (esat ⨟ esat₁) =
   monotonicity-ctxt ℐ base-mono step inv esat
 
 monotonicity-bdr :
-  (ℐ : AnnIntr {𝒜} 𝒯)
+  (ℐ : AnnInvr {𝒜} 𝒯)
   (tag : RuleTag) →
   let RTr = (AnnRules (ATAnn 𝒜) tag , 𝒯 tag) in
-  TransitInterpIs ℐ Monotonic tag →
+  InvrForRuleIs ℐ Monotonic tag →
   ∀ {ix s s′} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
     ATStep 𝒜 RTr s e s′ e′ →
     (I : AIInv ℐ s) →
@@ -126,15 +126,15 @@ monotonicity-bdr {𝒜} ℐ tag monotonic {ix = ix} {s = s} step inv esat
         where e₁ᵗ = exprᵗ (ATStep.termTmpl₁ step)
 
 monotonicity :
-  (ℐ : AnnIntr {𝒜} 𝒯) →
-  AnnTransitInterpIs ℐ Monotonic →
+  (ℐ : AnnInvr {𝒜} 𝒯) →
+  AnnInvrIs ℐ Monotonic →
   ∀ {ix s s′} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
     𝒯 ⊢ s , e ⟶ s′ , e′ →
     (I : AIInv ℐ s) →
     ℐ ⊨[ ix ] e →
     Σ[ I′ ∈ AIInv ℐ s′ ] ℐ ⊢ (s , I) ≼ (s′ , I′)
 monotonicity ℐ monotonic (R-redex step) inv esat =
-  inv , IsPreorder.reflexive (AnnIntr.isPreorder ℐ) refl
+  inv , IsPreorder.reflexive (AnnInvr.isPreorder ℐ) refl
 monotonicity ℐ monotonic (R-bdr tag s s′ step) inv esat =
   monotonicity-ctxt ℐ (monotonicity-bdr ℐ tag (monotonic tag)) step inv esat
 
@@ -142,7 +142,7 @@ monotonicity ℐ monotonic (R-bdr tag s s′ step) inv esat =
 
 
 soundness′-ctxt :
-  (ℐ : AnnIntr {𝒜} 𝒯) →
+  (ℐ : AnnInvr {𝒜} 𝒯) →
   (∀ {τᵣ ix s s′ eᵣ eᵣ′} →
     Rel {τᵣ} s eᵣ s′ eᵣ′ →
     (I : AIInv ℐ s) (I′ : AIInv ℐ s′) →
@@ -160,7 +160,7 @@ soundness′-ctxt ℐ base-sound injRel (RC-here step) inv inv′ mono esat =
   base-sound step inv inv′ mono esat
 soundness′-ctxt ℐ base-sound injRel (RC-B step) inv inv′ mono (B/i ix ix′ ix◁ix′ bsat esat) =
   B/i _ _ ix◁ix′
-      (AnnIntr.𝔹Sound ℐ (injRel step) inv inv′ mono bsat)
+      (AnnInvr.𝔹Sound ℐ (injRel step) inv inv′ mono bsat)
       (soundness′-ctxt ℐ base-sound injRel step inv inv′ mono esat)
 soundness′-ctxt ℐ base-sound injRel (RC-s step) inv inv′ mono (`s esat) =
   `s (soundness′-ctxt ℐ base-sound injRel step inv inv′ mono esat)
@@ -207,7 +207,7 @@ soundness′-ctxt ℐ base-sound injRel (RC-seq step) inv inv′ mono (esat ⨟ 
   esat₁
 
 soundness′-beta′ :
-  (ℐ : AnnIntr {𝒜} 𝒯) →
+  (ℐ : AnnInvr {𝒜} 𝒯) →
   ∀ {ix} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
     (s : ATState 𝒜) →
     BetaRel s e s e′ →
@@ -232,7 +232,7 @@ soundness′-beta′ ℐ s R-fix (fix esat) =
 soundness′-beta′ ℐ s (R-seq iv) (esat ⨟ esat₁) = esat₁
 
 soundness′-beta :
-  (ℐ : AnnIntr {𝒜} 𝒯) →
+  (ℐ : AnnInvr {𝒜} 𝒯) →
   ∀ {ix s s′} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
     (BetaRel s e s′ e′) →
     (I : AIInv ℐ s) (I′ : AIInv ℐ s′) →
@@ -243,10 +243,10 @@ soundness′-beta ℐ {s = s} step inv inv′ mono esat =
   soundness′-beta′ ℐ s step esat
 
 soundness′-bdr :
-  (ℐ : AnnIntr {𝒜} 𝒯)
+  (ℐ : AnnInvr {𝒜} 𝒯)
   (tag : RuleTag) →
   let RTr = AnnRules (ATAnn 𝒜) tag , 𝒯 tag in
-  TransitInterpIs ℐ Sound tag →
+  InvrForRuleIs ℐ Sound tag →
   ∀ {ix s s′} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
     ATStep 𝒜 RTr s e s′ e′ →
     (I : AIInv ℐ s) (I′ : AIInv ℐ s′) →
@@ -298,8 +298,8 @@ soundness′-bdr {𝒜} ℐ tag sound {ix = ix} {s = s} {s′ = s′} step inv i
                                               ix
 
 soundness′ :
-  (ℐ : AnnIntr {𝒜} 𝒯) →
-  AnnTransitInterpIs ℐ Sound →
+  (ℐ : AnnInvr {𝒜} 𝒯) →
+  AnnInvrIs ℐ Sound →
   ∀ {ix s s′} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
     (step : 𝒯 ⊢ s , e ⟶ s′ , e′) →
     (I  : AIInv ℐ s) (I′ : AIInv ℐ s′) →
@@ -312,9 +312,9 @@ soundness′ ℐ sound (R-bdr tag s s′ step) inv inv′ mono esat =
   soundness′-ctxt ℐ (soundness′-bdr ℐ tag (sound tag)) (R-bdr tag s s′) step inv inv′ mono esat
 
 soundness :
-  (ℐ : AnnIntr {𝒜} 𝒯) →
-  AnnTransitInterpIs ℐ Monotonic →
-  AnnTransitInterpIs ℐ Sound →
+  (ℐ : AnnInvr {𝒜} 𝒯) →
+  AnnInvrIs ℐ Monotonic →
+  AnnInvrIs ℐ Sound →
   ∀ {ix s s′} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
     (step : 𝒯 ⊢ s , e ⟶ s′ , e′) →
     AIInv ℐ s →
@@ -326,27 +326,27 @@ soundness ℐ monotonic sound step inv esat =
 
 mutual
   monotonicity* :
-    (ℐ : AnnIntr {𝒜} 𝒯) →
-    AnnTransitInterpIs ℐ Monotonic →
-    AnnTransitInterpIs ℐ Sound →
+    (ℐ : AnnInvr {𝒜} 𝒯) →
+    AnnInvrIs ℐ Monotonic →
+    AnnInvrIs ℐ Sound →
     ∀ {ix s s′} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
       𝒯 ⊢ s , e ⟶* s′ , e′ →
       (I : AIInv ℐ s) →
       ℐ ⊨[ ix ] e →
       Σ[ I′ ∈ AIInv ℐ s′ ] ℐ ⊢ (s , I) ≼ (s′ , I′)
   monotonicity* ℐ monotonic sound R-refl inv esat =
-    inv , IsPreorder.reflexive (AnnIntr.isPreorder ℐ) refl
+    inv , IsPreorder.reflexive (AnnInvr.isPreorder ℐ) refl
   monotonicity* ℐ monotonic sound (R-step steps step) inv esat =
     proj₁ inv′,s₁≼s′ ,
-    IsPreorder.trans (AnnIntr.isPreorder ℐ) (proj₂ inv₁,s≼s₁) (proj₂ inv′,s₁≼s′)
+    IsPreorder.trans (AnnInvr.isPreorder ℐ) (proj₂ inv₁,s≼s₁) (proj₂ inv′,s₁≼s′)
     where inv₁,s≼s₁ = monotonicity* ℐ monotonic sound steps inv esat
           esat₁ = soundness* ℐ monotonic sound steps inv esat
           inv′,s₁≼s′ = monotonicity ℐ monotonic step (proj₁ inv₁,s≼s₁) esat₁
 
   soundness* :
-    (ℐ : AnnIntr {𝒜} 𝒯) →
-    AnnTransitInterpIs ℐ Monotonic →
-    AnnTransitInterpIs ℐ Sound →
+    (ℐ : AnnInvr {𝒜} 𝒯) →
+    AnnInvrIs ℐ Monotonic →
+    AnnInvrIs ℐ Sound →
     ∀ {ix s s′} {e e′ : ATAnn 𝒜 ∣ [] ⊢ τ} →
       (step : 𝒯 ⊢ s , e ⟶* s′ , e′) →
       AIInv ℐ s →

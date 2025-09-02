@@ -44,7 +44,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 
 open import Contract.Common Label
 open import Contract.Base Label 𝒜
@@ -58,26 +58,26 @@ open AnnTerm 𝒜 hiding (State)
 open AnnTermView 𝒜cctc-view using (getAnn)
 open SECtcTransitSteps 𝒜cctc-view stronger?
 
-ℐnrheight : AnnIntr 𝒯cctc
-AnnIntr.Ix         ℐnrheight = ⊤
-AnnIntr.IxRel      ℐnrheight cκ ix ix′ = ⊤
-AnnIntr.Ord        ℐnrheight = trivialOrd
-AnnIntr.isPreorder ℐnrheight = trivialOrdIsPreorder
-AnnIntr.Inv        ℐnrheight s = ⊤
-AnnIntr.𝔹          ℐnrheight A ix◁ix′ e =
+ℐnrheight : AnnInvr 𝒯cctc
+AnnInvr.Ix         ℐnrheight = ⊤
+AnnInvr.IxRel      ℐnrheight cκ ix ix′ = ⊤
+AnnInvr.Ord        ℐnrheight = trivialOrd
+AnnInvr.isPreorder ℐnrheight = trivialOrdIsPreorder
+AnnInvr.Inv        ℐnrheight s = ⊤
+AnnInvr.𝔹          ℐnrheight A ix◁ix′ e =
   SECtcNonRecursive cκ ×
   SECtcMaxH cκ H
   where cκ = getAnn A
-AnnIntr.𝔹Sound     ℐnrheight (R-redex step)            inv inv′ mono cnr,cmh = cnr,cmh
-AnnIntr.𝔹Sound     ℐnrheight (R-bdr rule-no s s′ step) inv inv′ mono cnr,cmh = cnr,cmh
-AnnIntr.ℙ          ℐnrheight A ix◁ix′ em =
-  AnnIntr.𝔹 ℐnrheight A ix◁ix′ ⌊ em ⌋m
+AnnInvr.𝔹Sound     ℐnrheight (R-redex step)            inv inv′ mono cnr,cmh = cnr,cmh
+AnnInvr.𝔹Sound     ℐnrheight (R-bdr rule-no s s′ step) inv inv′ mono cnr,cmh = cnr,cmh
+AnnInvr.ℙ          ℐnrheight A ix◁ix′ em =
+  AnnInvr.𝔹 ℐnrheight A ix◁ix′ ⌊ em ⌋m
 
 
-ℐnrheight-monotonic : AnnTransitInterpIs ℐnrheight Monotonic
+ℐnrheight-monotonic : AnnInvrIs ℐnrheight Monotonic
 ℐnrheight-monotonic tag step esat₁ termSat = tt , tt
 
-ℐnrheight-sound : AnnTransitInterpIs ℐnrheight Sound
+ℐnrheight-sound : AnnInvrIs ℐnrheight Sound
 ℐnrheight-sound `R-cross-unit {s₁ = s₁}
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
           (s₁-status-eq , refl))

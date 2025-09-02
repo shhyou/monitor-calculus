@@ -11,5 +11,5 @@ open import SpaceEfficient.OrderedPredicate Level 𝒜csctc
 module _ (OP : OrderedPredicate (AnnTermView.getState 𝒜sctc-view) (AnnTermView.putState 𝒜sctc-view)) where
   open import SpaceEfficient.Equivalence.OpSemantics Level (OrderedPredicate.stronger? OP) public
   open import SpaceEfficient.Equivalence.Simulation Level OP public
-  open import SpaceEfficient.Equivalence.Interpretation Level OP public
+  open import SpaceEfficient.Equivalence.Invariant Level OP public
   open import SpaceEfficient.Equivalence.Soundness Level OP public

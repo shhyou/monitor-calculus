@@ -1,14 +1,14 @@
 {-# OPTIONS --without-K --safe #-}
 
-module Annotation.Interpretation.MetaVar.BoundaryPredicate where
+module Annotation.Invariant.MetaVar.BoundaryPredicate where
 
 open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import Annotation.Language
-open import Annotation.Interpretation.Base
-open import Annotation.Interpretation.MetaVar.Base
-open import Annotation.Interpretation.MetaVar.Predicate
+open import Annotation.Invariant.Base
+open import Annotation.Invariant.MetaVar.Base
+open import Annotation.Invariant.MetaVar.Predicate
 
 open import Relation.Binary.PropositionalEquality as PropEq
   using (_≡_; refl)
@@ -32,7 +32,7 @@ private variable
   τ : Ty
 
 
-IsSatIxPred : {ℐ : AnnIntr {𝒜} 𝒯} →
+IsSatIxPred : {ℐ : AnnInvr {𝒜} 𝒯} →
   TermTmplPred ℐ
 IsSatIxPred {ℐ = ℐ} = record
   { P = λ ϑ eᵗ →
@@ -87,7 +87,7 @@ IsSatIxPred {ℐ = ℐ} = record
       }
   }
 
-IsSatIx : ∀ {ℐ : AnnIntr {𝒜} 𝒯} →
+IsSatIx : ∀ {ℐ : AnnInvr {𝒜} 𝒯} →
   (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} →
   (∃ λ ix → ℐ ⊨[ ix ] esubstᵗ eᵗ ϑ) →
@@ -96,7 +96,7 @@ IsSatIx =
   TermTmplPred⇒MetaVarIxPred IsSatIxPred
 
 
-IsTermIxPred : {ℐ : AnnIntr {𝒜} 𝒯} → TermTmplPred ℐ
+IsTermIxPred : {ℐ : AnnInvr {𝒜} 𝒯} → TermTmplPred ℐ
 IsTermIxPred {𝒜 = 𝒜} {ℐ = ℐ} = record
   { P = λ ϑ eᵗ → ⊤
   ; varPred? = just (λ _ _ _ _ y → λ {ϑ = ϑ} tt:⊤ mvix ix* →
@@ -110,14 +110,14 @@ IsTermIxPred {𝒜 = 𝒜} {ℐ = ℐ} = record
   ; isSatDownwardClosed = λ ϑ → trivialIsSatDownwardClosed
   }
 
-IsTermIx : {ℐ : AnnIntr {𝒜} 𝒯} →
+IsTermIx : {ℐ : AnnInvr {𝒜} 𝒯} →
   (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} →
   ⊤ → MetaVarIx ℐ ϑ → AIIx ℐ → Set
 IsTermIx = TermTmplPred⇒MetaVarIxPred IsTermIxPred
 
 
-BoundarySatPred : {ℐ : AnnIntr {𝒜} 𝒯} → TermTmplPred ℐ
+BoundarySatPred : {ℐ : AnnInvr {𝒜} 𝒯} → TermTmplPred ℐ
 BoundarySatPred {ℐ = ℐ} = record
   { P = λ ϑ eᵗ → ⊤
   ; varPred? = nothing
@@ -136,7 +136,7 @@ BoundarySatPred {ℐ = ℐ} = record
   ; isSatDownwardClosed = λ ϑ → trivialIsSatDownwardClosed
   }
 
-BoundarySat : {ℐ : AnnIntr {𝒜} 𝒯} →
+BoundarySat : {ℐ : AnnInvr {𝒜} 𝒯} →
   (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} →
   ⊤ → MetaVarIx ℐ ϑ → AIIx ℐ → Set

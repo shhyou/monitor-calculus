@@ -47,7 +47,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 open import Annotation.Soundness
 
 open SpaceEfficient.Bounded.Base Label
@@ -81,21 +81,21 @@ open join-expquad join-flats-is-quadratic using (join-c₀; join-is-exp-quadrati
 join-bound : (c : ℕ) → (U : List Pred) → (h : ℕ) → ℕ
 join-bound c U h = c * ((length U ^ 2) * 2 ^ h)
 
-ℐsebnd : (c : ℕ) → AnnIntr 𝒯cntctc
-AnnIntr.Ix         (ℐsebnd _) = ⊤
-AnnIntr.IxRel      (ℐsebnd _) cκ ix ix′ = ⊤
-AnnIntr.Ord        (ℐsebnd _) = trivialOrd
-AnnIntr.isPreorder (ℐsebnd _) = trivialOrdIsPreorder
-AnnIntr.Inv        (ℐsebnd c) s = State.cost/se s ≤ State.count s * join-bound c ord-preds H
-AnnIntr.𝔹          (ℐsebnd _) cκ ix◁ix′ e =
+ℐsebnd : (c : ℕ) → AnnInvr 𝒯cntctc
+AnnInvr.Ix         (ℐsebnd _) = ⊤
+AnnInvr.IxRel      (ℐsebnd _) cκ ix ix′ = ⊤
+AnnInvr.Ord        (ℐsebnd _) = trivialOrd
+AnnInvr.isPreorder (ℐsebnd _) = trivialOrdIsPreorder
+AnnInvr.Inv        (ℐsebnd c) s = State.cost/se s ≤ State.count s * join-bound c ord-preds H
+AnnInvr.𝔹          (ℐsebnd _) cκ ix◁ix′ e =
   SECtcNonRecursive cκ ×
   SECtcPreds IsNonEmpty cκ ×
   SECtcPreds (ord-preds ⊇#_) cκ ×
   SECtcMaxH cκ H
-AnnIntr.𝔹Sound     (ℐsebnd _) (R-redex step)            inv inv′ mono cnr,cne,c#⊆U,cmh = cnr,cne,c#⊆U,cmh
-AnnIntr.𝔹Sound     (ℐsebnd _) (R-bdr rule-no s s′ step) inv inv′ mono cnr,cne,c#⊆U,cmh = cnr,cne,c#⊆U,cmh
-AnnIntr.ℙ          (ℐsebnd c) cκ ix◁ix′ em =
-  AnnIntr.𝔹 (ℐsebnd c) cκ ix◁ix′ ⌊ em ⌋m
+AnnInvr.𝔹Sound     (ℐsebnd _) (R-redex step)            inv inv′ mono cnr,cne,c#⊆U,cmh = cnr,cne,c#⊆U,cmh
+AnnInvr.𝔹Sound     (ℐsebnd _) (R-bdr rule-no s s′ step) inv inv′ mono cnr,cne,c#⊆U,cmh = cnr,cne,c#⊆U,cmh
+AnnInvr.ℙ          (ℐsebnd c) cκ ix◁ix′ em =
+  AnnInvr.𝔹 (ℐsebnd c) cκ ix◁ix′ ⌊ em ⌋m
 
 
 
@@ -153,7 +153,7 @@ join-bounded {cκ = cκ} {cκ′} cne cκ-us cmh cne′ cκ-us′ cmh′ = begin
 se-c₀ = 𝕌.base join-is-exp-quadratic
 join-c₀≤se-c₀ = ≤-refl
 
-ℐsebnd-monotonic : AnnTransitInterpIs (ℐsebnd se-c₀) Monotonic
+ℐsebnd-monotonic : AnnInvrIs (ℐsebnd se-c₀) Monotonic
 ℐsebnd-monotonic `R-cross-unit {s₁ = s₁}
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
           (.s₁ , (s₁-status-eq , refl) , (.s₁ , refl , (.s₁ , refl , refl))))
@@ -286,7 +286,7 @@ join-c₀≤se-c₀ = ≤-refl
     tt
 
 
-ℐsebnd-sound : AnnTransitInterpIs (ℐsebnd se-c₀) Sound
+ℐsebnd-sound : AnnInvrIs (ℐsebnd se-c₀) Sound
 ℐsebnd-sound `R-cross-unit {s₁ = s₁}
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
           (.s₁ , (s₁-status-eq , refl) , (.s₁ , refl , (.s₁ , refl , refl))))

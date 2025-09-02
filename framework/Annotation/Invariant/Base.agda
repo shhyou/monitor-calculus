@@ -1,6 +1,6 @@
 {-# OPTIONS --without-K --no-infer-absurd-clauses --safe #-}
 
-module Annotation.Interpretation.Base where
+module Annotation.Invariant.Base where
 
 open import Syntax.Type
 open import Syntax.Term
@@ -29,7 +29,7 @@ private variable
   Γ Γ′ : Ctxt
   τ τ′ τₐ τᵣ τ₁ τ₂ : Ty
 
-record AnnIntr (𝒯 : AnnTransit 𝒜) : Set₁ where
+record AnnInvr (𝒯 : AnnTransit 𝒜) : Set₁ where
   inductive; no-eta-equality
   open AnnTerm 𝒜
   field
@@ -57,32 +57,32 @@ record AnnIntr (𝒯 : AnnTransit 𝒜) : Set₁ where
       ∀ {ix ix′} → IxRel A ix ix′ →
       (em : Ann ∣ e ismonctorof τ) →
       Set
-open AnnIntr public using () renaming (Ix to AIIx; IxRel to AIIxRel; Inv to AIInv)
+open AnnInvr public using () renaming (Ix to AIIx; IxRel to AIIxRel; Inv to AIInv)
 
-_,_⊢_◁_ : (ℐ : AnnIntr {𝒜} 𝒯) →
+_,_⊢_◁_ : (ℐ : AnnInvr {𝒜} 𝒯) →
   ∀ {τ} → ATAnn 𝒜 τ → AIIx ℐ → AIIx ℐ → Set
-ℐ , A ⊢ ix₁ ◁ ix₂ = AnnIntr.IxRel ℐ A ix₁ ix₂
+ℐ , A ⊢ ix₁ ◁ ix₂ = AnnInvr.IxRel ℐ A ix₁ ix₂
 
-_⊢_≼_ : (ℐ : AnnIntr {𝒜} 𝒯) →
+_⊢_≼_ : (ℐ : AnnInvr {𝒜} 𝒯) →
   Σ (ATState 𝒜) (AIInv ℐ) → Σ (ATState 𝒜) (AIInv ℐ) → Set
-ℐ ⊢ invs ≼ invs′ = AnnIntr.Ord ℐ invs invs′
+ℐ ⊢ invs ≼ invs′ = AnnInvr.Ord ℐ invs invs′
 
-𝔹_⟦_,_,_,_⟧ : ∀ (ℐ : AnnIntr {𝒜} 𝒯) τ → let open AnnTerm 𝒜 in
+𝔹_⟦_,_,_,_⟧ : ∀ (ℐ : AnnInvr {𝒜} 𝒯) τ → let open AnnTerm 𝒜 in
   (A : Ann τ) →
   ∀ {ix ix′} → AIIxRel ℐ A ix ix′ →
   Ann ∣ [] ⊢ τ →
   Set
-𝔹 ℐ ⟦ τ , A , ix◁ix′ , e ⟧ = AnnIntr.𝔹 ℐ {τ} A ix◁ix′ e
+𝔹 ℐ ⟦ τ , A , ix◁ix′ , e ⟧ = AnnInvr.𝔹 ℐ {τ} A ix◁ix′ e
 
-ℙ_⟦_,_,_,_⟧ : ∀ (ℐ : AnnIntr {𝒜} 𝒯) τ {e} → let open AnnTerm 𝒜 in
+ℙ_⟦_,_,_,_⟧ : ∀ (ℐ : AnnInvr {𝒜} 𝒯) τ {e} → let open AnnTerm 𝒜 in
   (A : Ann τ) →
   ∀ {ix ix′} → AIIxRel ℐ A ix ix′ →
   (em : Ann ∣ e ismonctorof τ) →
   Set
-ℙ ℐ ⟦ τ , A , ix◁ix′ , em ⟧ = AnnIntr.ℙ ℐ {τ} A ix◁ix′ em
+ℙ ℐ ⟦ τ , A , ix◁ix′ , em ⟧ = AnnInvr.ℙ ℐ {τ} A ix◁ix′ em
 
 mutual
-  data _⊨[_]_ (ℐ : AnnIntr {𝒜} 𝒯) :
+  data _⊨[_]_ (ℐ : AnnInvr {𝒜} 𝒯) :
     (ix : AIIx ℐ) → (e : ATAnn 𝒜 ∣ Γ ⊢ τ) → Set where
       proxy/i : ∀ {A e} →
         (em : ATAnn 𝒜 ∣ e ismonctorof τ) →
@@ -202,17 +202,17 @@ mutual
         ----------------------
         ℐ ⊨[ ix ] (e ⨟ e₁)
 
-⌊_⌋i : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {e : ATAnn 𝒜 ∣ Γ ⊢ τ} {ix} →
+⌊_⌋i : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {e : ATAnn 𝒜 ∣ Γ ⊢ τ} {ix} →
   ℐ ⊨[ ix ] e  →  ATAnn 𝒜 ∣ Γ ⊢ τ
 ⌊_⌋i {e = e} esat = e
 
-i0mapsto [i0↦_] : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {ix} {e : ATAnn 𝒜 ∣ Γ ⊢ τ} →
+i0mapsto [i0↦_] : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {ix} {e : ATAnn 𝒜 ∣ Γ ⊢ τ} →
   ℐ ⊨[ ix ] e → ∀ {τ′} → (y : τ′ ∈ (τ ∷ Γ)) → ℐ ⊨[ ix ] x0mapsto e y
 i0mapsto esat (here refl)  = esat
 i0mapsto esat (there τ′∈Γ) = ` τ′∈Γ
 [i0↦_] = i0mapsto
 
-i0i1mapsto [i0↦_&&i1↦_] : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {ix}
+i0i1mapsto [i0↦_&&i1↦_] : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {ix}
   {e : ATAnn 𝒜 ∣ Γ ⊢ τ} →
   ℐ ⊨[ ix ] e →
   {e′ : ATAnn 𝒜 ∣ Γ ⊢ τ′} →
@@ -224,7 +224,7 @@ i0i1mapsto i0 i1 (there (here refl)) = i1
 i0i1mapsto i0 i1 (there (there τ″∈Γ)) = ` τ″∈Γ
 [i0↦_&&i1↦_] = i0i1mapsto
 
-irename : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {ix} →
+irename : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {ix} →
   {e : ATAnn 𝒜 ∣ Γ ⊢ τ} →
   ℐ ⊨[ ix ] e →
   (ren : ∀ {τ} → τ ∈ Γ → τ ∈ Γ′) →
@@ -252,14 +252,14 @@ irename (roll τ e) ren = roll τ (irename e ren)
 irename (fix e) ren = fix (irename e (pext ren))
 irename (e ⨟ e₁) ren = irename e ren ⨟ irename e₁ ren
 
-iext : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {ix} →
+iext : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {ix} →
   {σ : ∀ {τ′} → τ′ ∈ Γ → ATAnn 𝒜 ∣ Γ′ ⊢ τ′} →
   (∀ {τ′} → (y : τ′ ∈ Γ) → ℐ ⊨[ ix ] σ y) →
   ∀ {τ′} → (y : τ′ ∈ τ ∷ Γ) → ℐ ⊨[ ix ] eext σ y
 iext ⊨σ (here refl) = ` here refl
 iext ⊨σ (there τ∈Γ) = irename (⊨σ τ∈Γ) there
 
-isubst : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {ix} →
+isubst : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {ix} →
     {e : ATAnn 𝒜 ∣ Γ ⊢ τ} →
     {σ : ∀ {τ′} → τ′ ∈ Γ → ATAnn 𝒜 ∣ Γ′ ⊢ τ′} →
     ℐ ⊨[ ix ] e →
@@ -288,7 +288,7 @@ isubst (roll τ e) ⊨σ = roll τ (isubst e ⊨σ)
 isubst (fix e) ⊨σ = fix (isubst e (iext ⊨σ))
 isubst (e ⨟ e₁) ⊨σ = isubst e ⊨σ ⨟ isubst e₁ ⊨σ
 
-relabel-nat-val : ∀ {𝒜 𝒯} {ℐ : AnnIntr {𝒜} 𝒯} {ix ix′ n} →
+relabel-nat-val : ∀ {𝒜 𝒯} {ℐ : AnnInvr {𝒜} 𝒯} {ix ix′ n} →
   (iv  :  ATAnn 𝒜  ∣  n isvalof `ℕ) →
   ℐ ⊨[ ix ] n →
   ℐ ⊨[ ix′ ] n
@@ -296,7 +296,7 @@ relabel-nat-val (proxy/v A ()) _
 relabel-nat-val z/v            _         = `z
 relabel-nat-val (s/v iv)       (`s nsat) = `s (relabel-nat-val iv nsat)
 
-idecompose-by-ectxt : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {ix e eᵣ} →
+idecompose-by-ectxt : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {ix e eᵣ} →
   (ec : ATAnn 𝒜 ∣ e ⦂ τ ▷ eᵣ ⦂ τᵣ) →
   ℐ ⊨[ ix ] e →
   ∃[ ix′ ] ℐ ⊨[ ix′ ] eᵣ

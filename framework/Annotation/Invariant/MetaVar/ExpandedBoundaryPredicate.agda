@@ -1,15 +1,15 @@
 {-# OPTIONS --without-K --safe #-}
 
-module Annotation.Interpretation.MetaVar.ExpandedBoundaryPredicate where
+module Annotation.Invariant.MetaVar.ExpandedBoundaryPredicate where
 
 open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import Annotation.Language
-open import Annotation.Interpretation.Base
-open import Annotation.Interpretation.MetaVar.Base
-open import Annotation.Interpretation.MetaVar.Predicate
-open import Annotation.Interpretation.MetaVar.BoundaryPredicate
+open import Annotation.Invariant.Base
+open import Annotation.Invariant.MetaVar.Base
+open import Annotation.Invariant.MetaVar.Predicate
+open import Annotation.Invariant.MetaVar.BoundaryPredicate
  renaming (IsSatIx to MVIsSatIx; BoundarySat to MVBoundarySat; IsTermIx to MVIsTermIx)
 
 open import Relation.Binary.PropositionalEquality as PropEq
@@ -32,7 +32,7 @@ private variable
 
 -- The expanded version os IsSatIx, IsTermIx and BoundarySat
 
-IsSatIx : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} {ix} →
+IsSatIx : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} {ix} →
   (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   ℐ ⊨[ ix ] esubstᵗ eᵗ ϑ →
   MetaVarIx ℐ ϑ → Set
@@ -80,7 +80,7 @@ IsSatIx (e ⨟ e₁) (esat ⨟ esat₁) ⊨mv =
   IsSatIx e₁ esat₁ ⊨mv
 
 
-BoundarySat : {ℐ : AnnIntr {𝒜} 𝒯} →
+BoundarySat : {ℐ : AnnInvr {𝒜} 𝒯} →
   (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   ∀ {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} → MetaVarIx ℐ ϑ → Set
 BoundarySat (# y) mvix = ⊤
@@ -126,7 +126,7 @@ BoundarySat (e ⨟ e₁) mvix =
   BoundarySat e₁ mvix
 
 
-IsTermIx : {ℐ : AnnIntr {𝒜} 𝒯} →
+IsTermIx : {ℐ : AnnInvr {𝒜} 𝒯} →
   (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} → MetaVarIx ℐ ϑ → AIIx ℐ → Set
 IsTermIx {𝒜 = 𝒜} {ℐ = ℐ} (# y) {ϑ = ϑ} mvix ix =

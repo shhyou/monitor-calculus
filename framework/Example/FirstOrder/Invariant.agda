@@ -2,7 +2,7 @@
 
 open import Annotation.Language
 
-module Example.FirstOrder.Interpretation (𝒜 : AnnTerm) where
+module Example.FirstOrder.Invariant (𝒜 : AnnTerm) where
 
 open import Relation.Binary.PropositionalEquality as PropEq
   using (_≡_; refl)
@@ -23,7 +23,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
-open import Annotation.Interpretation
+open import Annotation.Invariant
 open import Example.FirstOrder.FirstOrderTy 𝒜
 open import Example.FirstOrder.FlatBoundaryExpr 𝒜
 
@@ -37,27 +37,27 @@ private variable
   τ τ₁ τ₂ τₐ τᵣ : TyN Δ
   e : Ann ∣ Γ ⊢ τ
 
-ℐfstord : ∀ 𝒯 → AnnIntr {𝒜} 𝒯
-AnnIntr.Ix         (ℐfstord 𝒯) = ⊤
-AnnIntr.IxRel      (ℐfstord 𝒯) A ix ix′ = ⊤
-AnnIntr.Inv        (ℐfstord 𝒯) s = ⊤
-AnnIntr.Ord        (ℐfstord 𝒯) = trivialOrd
-AnnIntr.isPreorder (ℐfstord 𝒯) = trivialOrdIsPreorder
-AnnIntr.𝔹          (ℐfstord 𝒯) {τ = τ} A ix◁ix′ e =
+ℐfstord : ∀ 𝒯 → AnnInvr {𝒜} 𝒯
+AnnInvr.Ix         (ℐfstord 𝒯) = ⊤
+AnnInvr.IxRel      (ℐfstord 𝒯) A ix ix′ = ⊤
+AnnInvr.Inv        (ℐfstord 𝒯) s = ⊤
+AnnInvr.Ord        (ℐfstord 𝒯) = trivialOrd
+AnnInvr.isPreorder (ℐfstord 𝒯) = trivialOrdIsPreorder
+AnnInvr.𝔹          (ℐfstord 𝒯) {τ = τ} A ix◁ix′ e =
   FirstOrderTy τ × FlatBdrExpr e
-AnnIntr.𝔹Sound (ℐfstord 𝒯) (R-redex step)        inv inv′ mono (τ/fo , e/fb) =
+AnnInvr.𝔹Sound (ℐfstord 𝒯) (R-redex step)        inv inv′ mono (τ/fo , e/fb) =
   τ/fo ,′
   fbexpr-ctxt fbexpr-betarel step e/fb
-AnnIntr.𝔹Sound (ℐfstord 𝒯) (R-bdr tag s s′ step) inv inv′ mono (τ/fo , e/fb) =
+AnnInvr.𝔹Sound (ℐfstord 𝒯) (R-bdr tag s s′ step) inv inv′ mono (τ/fo , e/fb) =
   τ/fo ,′
   fbexpr-ctxt (fbexpr-bdrrel 𝒯 tag) step e/fb
-AnnIntr.ℙ (ℐfstord 𝒯) A ix◁ix′ em =
-  AnnIntr.𝔹 (ℐfstord 𝒯) A ix◁ix′ ⌊ em ⌋m
+AnnInvr.ℙ (ℐfstord 𝒯) A ix◁ix′ em =
+  AnnInvr.𝔹 (ℐfstord 𝒯) A ix◁ix′ ⌊ em ⌋m
 
-ℐfstord-monotonic : ∀ 𝒯 → AnnTransitInterpIs (ℐfstord 𝒯) Monotonic
+ℐfstord-monotonic : ∀ 𝒯 → AnnInvrIs (ℐfstord 𝒯) Monotonic
 ℐfstord-monotonic 𝒯 tag step esat₁ termSat = tt , tt
 
-ℐfstord-sound : ∀ 𝒯 → AnnTransitInterpIs (ℐfstord 𝒯) Sound
+ℐfstord-sound : ∀ 𝒯 → AnnInvrIs (ℐfstord 𝒯) Sound
 ℐfstord-sound 𝒯 `R-cross-unit
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit trWit)
   (B/i ix ix′ ix◁ix′ bsat ⋆)

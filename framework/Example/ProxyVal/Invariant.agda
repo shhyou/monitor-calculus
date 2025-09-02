@@ -1,6 +1,6 @@
 {-# OPTIONS --without-K --safe #-}
 
-module Example.ProxyVal.Interpretation where
+module Example.ProxyVal.Invariant where
 
 open import Utils.Misc  -- for trivialOrd and trivialOrdIsPreorder
 open import Syntax.Type
@@ -8,7 +8,7 @@ open import Syntax.Term
 open import Syntax.Template
 open import OpSemantics.Base
 open import Annotation.Language
-open import Annotation.Interpretation
+open import Annotation.Invariant
 open import Annotation.Soundness
 
 open import Relation.Binary.PropositionalEquality as PropEq
@@ -37,20 +37,20 @@ private variable
   Γ : Ctxt
   τ τ′ τₐ τᵣ τ₁ τ₂ : Ty
 
-ℐproxyval : AnnIntr {𝒜} 𝒯
-AnnIntr.Ix         (ℐproxyval {𝒜}) = ⊤
-AnnIntr.IxRel      (ℐproxyval {𝒜}) A ix ix′ = ⊤
-AnnIntr.Inv        (ℐproxyval {𝒜}) s = ⊤
-AnnIntr.Ord        (ℐproxyval {𝒜}) = trivialOrd
-AnnIntr.isPreorder (ℐproxyval {𝒜}) = trivialOrdIsPreorder
-AnnIntr.𝔹          (ℐproxyval {𝒜}) A ix◁ix′ e = ⊤
-AnnIntr.𝔹Sound     (ℐproxyval {𝒜}) step inv inv′ mono bsat = bsat
-AnnIntr.ℙ          (ℐproxyval {𝒜}) {τ = τ} A ix◁ix′ em = (ATAnn 𝒜  ∣  ⌊ em ⌋m isvalof τ)
+ℐproxyval : AnnInvr {𝒜} 𝒯
+AnnInvr.Ix         (ℐproxyval {𝒜}) = ⊤
+AnnInvr.IxRel      (ℐproxyval {𝒜}) A ix ix′ = ⊤
+AnnInvr.Inv        (ℐproxyval {𝒜}) s = ⊤
+AnnInvr.Ord        (ℐproxyval {𝒜}) = trivialOrd
+AnnInvr.isPreorder (ℐproxyval {𝒜}) = trivialOrdIsPreorder
+AnnInvr.𝔹          (ℐproxyval {𝒜}) A ix◁ix′ e = ⊤
+AnnInvr.𝔹Sound     (ℐproxyval {𝒜}) step inv inv′ mono bsat = bsat
+AnnInvr.ℙ          (ℐproxyval {𝒜}) {τ = τ} A ix◁ix′ em = (ATAnn 𝒜  ∣  ⌊ em ⌋m isvalof τ)
 
-ℐproxyval-monotonic : AnnTransitInterpIs {𝒯 = 𝒯} ℐproxyval Monotonic
+ℐproxyval-monotonic : AnnInvrIs {𝒯 = 𝒯} ℐproxyval Monotonic
 ℐproxyval-monotonic tag step esat₁ termSat = tt , tt
 
-ℐproxyval-sound : AnnTransitInterpIs {𝒯 = 𝒯} ℐproxyval Sound
+ℐproxyval-sound : AnnInvrIs {𝒯 = 𝒯} ℐproxyval Sound
 ℐproxyval-sound `R-cross-unit
   (mkStep refl termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit trWit)
   (B/i ix ix′ ix◁ix′ bsat ⋆) termSat inv′,mono = record

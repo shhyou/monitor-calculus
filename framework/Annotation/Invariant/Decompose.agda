@@ -1,13 +1,13 @@
 {-# OPTIONS --without-K --no-infer-absurd-clauses --safe #-}
 
-module Annotation.Interpretation.Decompose where
+module Annotation.Invariant.Decompose where
 
 open import Syntax.Type
 open import Syntax.Term
 open import Syntax.Template
 open import Annotation.Language
-open import Annotation.Interpretation.Base
-open import Annotation.Interpretation.MetaVar
+open import Annotation.Invariant.Base
+open import Annotation.Invariant.MetaVar
 
 open import Relation.Binary.PropositionalEquality as PropEq
   using (_≡_; refl; sym; trans; subst; cong)
@@ -38,7 +38,7 @@ private variable
   τ : Ty
 
 
-SatIx⇒TermIx : ∀ {ℐ : AnnIntr {𝒜} 𝒯} {ix ϑ mvix} →
+SatIx⇒TermIx : ∀ {ℐ : AnnInvr {𝒜} 𝒯} {ix ϑ mvix} →
     (eᵗ : ATAnn 𝒜 ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
     {esat : ℐ ⊨[ ix ] esubstᵗ eᵗ ϑ} →
     IsSatIx eᵗ (ix , esat) mvix ix →
@@ -82,7 +82,7 @@ SatIx⇒TermIx (e ⨟ e₁) {esat ⨟ esat₁} (intrix , intrix₁) =
   SatIx⇒TermIx e₁ intrix₁
 
 
-⊨⇒BoundarySat : {ℐ : AnnIntr {𝒜} 𝒯} →
+⊨⇒BoundarySat : {ℐ : AnnInvr {𝒜} 𝒯} →
   (eᵗ : (ATAnn 𝒜) ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   ∀ {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} {ix} →
     {mvix : MetaVarIx ℐ ϑ} →
@@ -130,7 +130,7 @@ SatIx⇒TermIx (e ⨟ e₁) {esat ⨟ esat₁} (intrix , intrix₁) =
   ⊨⇒BoundarySat e₁ ℐ⊨e₁ intrix₁
 
 
-isubstᵗ : {ℐ : AnnIntr {𝒜} 𝒯} →
+isubstᵗ : {ℐ : AnnInvr {𝒜} 𝒯} →
   (eᵗ : (ATAnn 𝒜) ⨟ Ψ ⨟ Δ ∣ Γ ⊢ τ) →
   ∀ {ϑ : MetaVar (ATAnn 𝒜) Ψ Δ} {mvix : MetaVarIx ℐ ϑ} {ix} →
     (⊨ϑ : MetaVarSat ℐ (termEnvᵗ ϑ) (varIxᵗ mvix)) →
