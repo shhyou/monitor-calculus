@@ -1,3 +1,0 @@
-name: contract-trsys
-depend: standard-library-2.1
-include: .
