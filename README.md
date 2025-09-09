@@ -15,9 +15,9 @@ To type check the proofs, visit [framework/](framework/) and load [Everything.ag
 
 - Section 2.1: Findler-Felleisen contracts.
 
-  The [`Contract/`](framework/Contract/) directory contains $(\mathscr{A}\_\mathit{ctc},\mathscr{T}\_c$, the annotation language
+  The [`Contract/`](framework/Contract/) directory contains $(\mathscr{A}\_\mathit{ctc},\mathscr{T}\_c)$, the annotation language
   that captures Findler-Felleisen contracts.
-  In the code, $\kappa : \mathsf{Ctc}\,\tau$ is the datatype, `SCtc1N` [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Contract.Base.html#1139),
+  In the code, $\kappa : \mathsf{Ctc}\\,\tau$ is the datatype, `SCtc1N` [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Contract.Base.html#1139),
   $\mathscr{A}\_\mathit{ctc}$ is called `𝒜sctc` [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Contract.Base.html#4909),
   and $\mathscr{T}\_c$ is called `𝒯sctc` [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Contract.Base.html#5742).
 
@@ -36,9 +36,9 @@ To type check the proofs, visit [framework/](framework/) and load [Everything.ag
 
   The calculus is formalized in three parts: its [syntax](framework/Syntax/) [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Syntax.Term.html#1009), [operational semantics](framework/OpSemantics/), and its parameter—[the annotation languages](framework/Annotation/Language.agda#L34) [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Annotation.Language.html#838).
 
-  The reduction relation $\longmapsto$ is defined in [`OpSemantics/Base.agda`](framework/OpSemantics/Base.agda#L46) [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/OpSemantics.Base.html#1293).
-  The program-related reduction relation $\longmapsto_p$ is `CtxtRel 𝒜 BetaRel`, and
-  the monitor-related reduction relation $\longmapsto_m$ is (approximately) `∀ tag → CtxtRel 𝒜 (Step (AnnRules Ann tag , 𝒯 tag))`. See the types of `R-redex` and `R-bdr`.
+  The reduction relation $\longrightarrow$ is defined in [`OpSemantics/Base.agda`](framework/OpSemantics/Base.agda#L46) [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/OpSemantics.Base.html#1293).
+  The program-related reduction relation $\longrightarrow_p$ is `CtxtRel 𝒜 BetaRel`, and
+  the monitor-related reduction relation $\longrightarrow_m$ is (approximately) `∀ tag → CtxtRel 𝒜 (Step (AnnRules Ann tag , 𝒯 tag))`. See the types of `R-redex` and `R-bdr`.
 
   See [the counting example](framework/Example/Count/Annotation.agda) [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Example.Count.Annotation.html) for a simple language (and the code for its monitor-related rules). Also see the simple-contract example, [`ClosedAnnotation.agda`](framework/Example/SimpleContract/ClosedAnnotation.agda#L132) [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Example.SimpleContract.ClosedAnnotation.html#3660), for the actual representation of annotations. The simple-contract example is further refined in [`ExtensibleAnnotation.agda`](framework/Example/SimpleContract/ExtensibleAnnotation.agda#L139) [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Example.SimpleContract.ExtensibleAnnotation.html#3783) to illustrate the use of lenses for building extensible annotation languages.
 
