@@ -14,7 +14,7 @@ import Data.List.Properties as List
 open import Data.List.Relation.Unary.Any as ListAny using (Any; here; there)
 open import Data.List.Membership.Propositional using (_∈_)
 
-open import Function.Base using (id; const)
+open import Function.Base using (id; const; _∘′_)
 
 open import Data.Tick using (Tick; evalTick; ✓_)
 
@@ -36,8 +36,16 @@ open AnnTerm 𝒜ccctc hiding (State)
 
 private variable
   Δ Δ′ : TCtxt
-  τ τ₁ τ₂ τₐ τᵣ : TyN Δ
+  τ τ′ τ₁ τ₂ τₐ τᵣ : TyN Δ
   P Q : List Pred → Set
+
+record SECtcAnn τ : Set where
+  constructor mkAnn; inductive
+  field       runAnn : SECtcN [] τ
+open SECtcAnn public
+
+mapAnn : (SECtcN [] τ → SECtcN [] τ′) → SECtcAnn τ → SECtcAnn τ′
+mapAnn f = mkAnn ∘′ f ∘′ runAnn
 
 record State : Set where
   inductive
@@ -47,7 +55,7 @@ record State : Set where
     cost/se : ℕ
     count     : ℕ
 
-AnnTerm.Ann   𝒜ccctc τ = SECtcN [] τ
+AnnTerm.Ann   𝒜ccctc τ = SECtcAnn τ
 AnnTerm.State 𝒜ccctc = State
 
 init-state : State
@@ -59,7 +67,7 @@ init-state = record
   }
 
 𝒜cctc-view : AnnTermView 𝒜ccctc 𝒜cctc
-𝒜cctc-view = mkView id
+𝒜cctc-view = mkView runAnn
                     State.status
                     (λ st′ s → record s { status = st′ })
                     (λ s → refl)
@@ -67,7 +75,7 @@ init-state = record
                     (λ s₁ s₂ s₂′ → refl)
 
 𝒜chkcost-view : AnnTermView 𝒜ccctc 𝒜chkcost
-𝒜chkcost-view = mkView id
+𝒜chkcost-view = mkView runAnn
                         State.cost/chk
                         (λ c′ s → record s { cost/chk = c′ })
                         (λ s → refl)
@@ -75,7 +83,7 @@ init-state = record
                         (λ s₁ s₂ s₂′ → refl)
 
 𝒜secost-view : AnnTermView 𝒜ccctc 𝒜secost
-𝒜secost-view = mkView id
+𝒜secost-view = mkView runAnn
                       State.cost/se
                       (λ c′ s → record s { cost/se = c′ })
                       (λ s → refl)

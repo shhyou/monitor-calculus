@@ -85,13 +85,13 @@ open SECtcTransitSteps 𝒜cctc-view stronger?
           trWit@(s* , (s₁ , (refl , refl) , cκ-checks-tr) , (s₂ , (refl , refl) , sκs-checks-tr)))
   (B/i ix ix′ ix◁ix′ bsat esat)
   termSat@record { inv = I; boundarySat = _ , (pmκ , c⊆s) } =
-    check-nat-ctc-sim (proj₂(ψ₁(here refl)))
+    check-nat-ctc-sim (getLSCtc(ψ₁(here refl)))
                       premWit
                       []
                       (clc-flat-preds c⊆s)
                       I
                       (subst  (λ cκ → checkNatSECtc cκ (termEnv(here refl)) s₁ _)
-                              (flat/cc-η (proj₁(ψ₁(here refl))))
+                              (flat/cc-η (getSECtc(ψ₁(here refl))))
                               cκ-checks-tr)
                       sκs-checks-tr
 ℐsim-monotonic `R-cross-cons
@@ -220,7 +220,7 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
                                                           (Vec.fromList-map */c-sκ₂ sκs)
                                                           (clc-*₂ c⊆s)))
     }
-    where sκs = proj₂(ψ₁(here refl))
+    where sκs = getLSCtc(ψ₁(here refl))
 ℐsim-sound `R-cross-inl
   (mkStep ((τ₁ , τ₂) , refl) termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
         trWit@(s* , ((cs-eq , refl) , cκ-eq) , ((ss-eq , refl) , sκs-eq)))
@@ -239,7 +239,7 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
                                                         (Vec.fromList-map +/c-sκ₁ sκs)
                                                         (clc-+₁ c⊆s))
     }
-    where sκs = proj₂(ψ₁(here refl))
+    where sκs = getLSCtc(ψ₁(here refl))
 ℐsim-sound `R-cross-inr
   (mkStep ((τ₁ , τ₂) , refl) termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
         trWit@(s* , ((cs-eq , refl) , cκ-eq) , ((ss-eq , refl) , sκs-eq)))
@@ -258,7 +258,7 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
                                                         (Vec.fromList-map +/c-sκ₂ sκs)
                                                         (clc-+₂ c⊆s))
     }
-    where sκs = proj₂(ψ₁(here refl))
+    where sκs = getLSCtc(ψ₁(here refl))
 ℐsim-sound `R-cross-roll
   (mkStep (τ′ , refl) termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
         trWit@(s* , ((cs-eq , refl) , cκ-eq) , ((ss-eq , refl) , sκs-eq)))
@@ -277,7 +277,7 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
                                                         (Vec.fromList-map μ/c-sκ sκs)
                                                         (clc-μ-pos pmκ c⊆s))
     }
-    where sκs = proj₂(ψ₁(here refl))
+    where sκs = getLSCtc(ψ₁(here refl))
 ℐsim-sound `R-cross-box
   (mkStep (τ′ , refl) termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
         trWit@(s* , ((cs-eq , refl) , cκ-eq) , ((ss-eq , refl) , sκs-eq)))
@@ -325,8 +325,8 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
                                                         (Vec.fromList-++ sκs′)
                                                         (clc-join c⊆s′ c⊆s))
     }
-    where sκs = proj₂(ψ₁(here refl))
-          sκs′ = proj₂(ψ₁(there (here refl)))
+    where sκs = getLSCtc(ψ₁(here refl))
+          sκs′ = getLSCtc(ψ₁(there (here refl)))
 ℐsim-sound `R-merge-lam
   (mkStep ((τₐ , τᵣ) , refl) termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
         trWit@(s* , ((cs-eq , refl) , cκ-eq) , ((ss-eq , refl) , sκs-eq)))
@@ -346,8 +346,8 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
                                                         (Vec.fromList-++ sκs′)
                                                         (clc-join c⊆s′ c⊆s))
     }
-    where sκs = proj₂(ψ₁(here refl))
-          sκs′ = proj₂(ψ₁(there (here refl)))
+    where sκs = getLSCtc(ψ₁(here refl))
+          sκs′ = getLSCtc(ψ₁(there (here refl)))
 ℐsim-sound `R-proxy-unbox
   (mkStep tt termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
         trWit@(s* , ((cs-eq , refl) , cκ-eq) , ((ss-eq , refl) , sκs-eq)))
@@ -366,7 +366,7 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
                                                         (Vec.fromList-map box/c-sκ sκs)
                                                         (clc-box c⊆s))
     }
-    where sκs = proj₂(ψ₁(here refl))
+    where sκs = getLSCtc(ψ₁(here refl))
 ℐsim-sound `R-proxy-β
   (mkStep τₐ termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
         trWit@(s* , ((cs-eq , refl) , (cκₐ-eq , cκᵣ-eq)) , ((ss-eq , refl) , (sκsₐ-eq , sκsᵣ-eq))))
@@ -408,7 +408,7 @@ subst-CollapsedCtcs-len {cκ = cκ} {sκs′} refl sκs-eq clc
                                  ∎)
                                  (clc-dom c⊆s)))
     }
-    where sκs = proj₂(ψ₁(here refl))
+    where sκs = getLSCtc(ψ₁(here refl))
           len-rev-eq = List.length-reverse (List.map →/c-dom-sκ sκs)
           len-map-eq = List.length-map →/c-dom-sκ sκs
           open CastReasoning

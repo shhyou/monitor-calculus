@@ -88,10 +88,10 @@ AnnIntr.Ord        (ℐsebnd _) = trivialOrd
 AnnIntr.isPreorder (ℐsebnd _) = trivialOrdIsPreorder
 AnnIntr.Inv        (ℐsebnd c) s = State.cost/se s ≤ State.count s * join-bound c ord-preds H
 AnnIntr.𝔹          (ℐsebnd _) cκ ix◁ix′ e =
-  SECtcNonRecursive cκ ×
-  SECtcPreds IsNonEmpty cκ ×
-  SECtcPreds (ord-preds ⊇#_) cκ ×
-  SECtcMaxH cκ H
+  SECtcNonRecursive (runAnn cκ) ×
+  SECtcPreds IsNonEmpty (runAnn cκ) ×
+  SECtcPreds (ord-preds ⊇#_) (runAnn cκ) ×
+  SECtcMaxH (runAnn cκ) H
 AnnIntr.𝔹Sound     (ℐsebnd _) (R-redex step)            inv inv′ mono cnr,cne,c#⊆U,cmh = cnr,cne,c#⊆U,cmh
 AnnIntr.𝔹Sound     (ℐsebnd _) (R-bdr rule-no s s′ step) inv inv′ mono cnr,cne,c#⊆U,cmh = cnr,cne,c#⊆U,cmh
 AnnIntr.ℙ          (ℐsebnd c) cκ ix◁ix′ em =
@@ -181,14 +181,14 @@ join-c₀≤se-c₀ = ≤-refl
 
       se-cost = join-bound se-c₀ ord-preds H
 
-      cκ-preds = flat/cc-preds (ψ₁(here refl))
+      cκ-preds = flat/cc-preds (runAnn(ψ₁(here refl)))
 
       s₃-chkcost,s₃-secost,cnt-eq : State.cost/chk s₁ ≡ State.cost/chk s₃ ×
                                     State.cost/se s₁ ≡ State.cost/se s₃ ×
                                     State.count s₁ ≡ State.count s₃
       s₃-chkcost,s₃-secost,cnt-eq =
         check-nat-cctc-preserve-state cκ-preds
-                                      (subst check-nat-ty (flat/cc-η (ψ₁(here refl))) cκ-checks-tr)
+                                      (subst check-nat-ty (flat/cc-η (runAnn(ψ₁(here refl)))) cκ-checks-tr)
         where check-nat-ty = λ cκ → checkNatSECtc cκ (termEnv(here refl)) s₁ s₃
 ℐsebnd-monotonic `R-cross-cons {s₁ = s₁}
   (mkStep ((τ₁ , τ₂) , refl) termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
@@ -239,7 +239,7 @@ join-c₀≤se-c₀ = ≤-refl
   (record { boundarySat = (_ , cnr , cne , cκ-us , cmh) , (_ , cnr′ , cne′ , cκ-us′ , cmh′)
           ; inv = I }) =
     (begin
-      State.cost/se s₁ + execTick (✓ join cκ′ cκ)
+      State.cost/se s₁ + execTick (✓ join (runAnn cκ′) (runAnn cκ))
         ≤⟨ Nat.+-monoʳ-≤ (State.cost/se s₁) (join-bounded cne′ cκ-us′ cmh′ cne cκ-us cmh) ⟩
       State.cost/se s₁ + se-cost          ≤⟨ Nat.+-monoˡ-≤ se-cost I ⟩
       State.count s₁ * se-cost + se-cost  ≡⟨ Nat.+-comm (State.count s₁ * se-cost) se-cost ⟩
@@ -258,7 +258,7 @@ join-c₀≤se-c₀ = ≤-refl
   (record { boundarySat = (_ , cnr , cne , cκ-us , cmh) , (_ , cnr′ , cne′ , cκ-us′ , cmh′)
           ; inv = I }) =
     (begin
-      State.cost/se s₁ + execTick (✓ join cκ′ cκ)
+      State.cost/se s₁ + execTick (✓ join (runAnn cκ′) (runAnn cκ))
         ≤⟨ Nat.+-monoʳ-≤ (State.cost/se s₁) (join-bounded cne′ cκ-us′ cmh′ cne cκ-us cmh) ⟩
       State.cost/se s₁ + se-cost          ≤⟨ Nat.+-monoˡ-≤ se-cost I ⟩
       State.count s₁ * se-cost + se-cost  ≡⟨ Nat.+-comm (State.count s₁ * se-cost) se-cost ⟩

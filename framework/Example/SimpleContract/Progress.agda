@@ -29,22 +29,16 @@ open import OpSemantics.TypeSafety
 open import Annotation.Interpretation
 open import Annotation.Soundness
 
-𝒜ctc : AnnTerm
-Pred⟦_⟧ : Fin m → ∀ {v} → ATAnn 𝒜ctc ∣ v isvalof `ℕ → Bool
-Pred⟦ m ⟧ = ℙ𝕣𝕖𝕕 m ∘′ nat-val⇒ℕ where
-  nat-val⇒ℕ : ∀ {v} → ATAnn 𝒜ctc ∣ v isvalof `ℕ → ℕ
-  nat-val⇒ℕ z/v      = zero
-  nat-val⇒ℕ (s/v iv) = suc (nat-val⇒ℕ iv)
-
-open import Example.SimpleContract.ExtensibleAnnotation 𝒜ctc Pred⟦_⟧
+open import Example.SimpleContract.ExtensibleAnnotation m
   hiding (𝒜ctc)
-open import Example.FirstOrder.FirstOrderTy 𝒜ctc
-open import Example.FirstOrder.FlatBoundaryExpr 𝒜ctc
-open import Example.FirstOrder.Interpretation 𝒜ctc
 
+𝒜ctc : AnnTerm
 AnnTerm.Ann   𝒜ctc τ = CtcN [] τ
 AnnTerm.State 𝒜ctc   = Status
 
+open import Example.FirstOrder.FirstOrderTy 𝒜ctc
+open import Example.FirstOrder.FlatBoundaryExpr 𝒜ctc
+open import Example.FirstOrder.Interpretation 𝒜ctc
 open AnnTerm 𝒜ctc using (Ann; State)
 
 import TransitionRelationUtil
@@ -57,6 +51,14 @@ private variable
   τ τ₁ τ₂ τₐ τᵣ : TyN Δ
   e e′ : Ann ∣ Γ ⊢ τ
   v : Ann ∣ [] ⊢ τ
+
+Pred⟦_⟧ : Fin m → ∀ {v} → Ann ∣ v isvalof `ℕ → Bool
+Pred⟦ m ⟧ = ℙ𝕣𝕖𝕕 m ∘′ nat-val⇒ℕ where
+  nat-val⇒ℕ : ∀ {v} → Ann ∣ v isvalof `ℕ → ℕ
+  nat-val⇒ℕ z/v      = zero
+  nat-val⇒ℕ (s/v iv) = suc (nat-val⇒ℕ iv)
+
+open MonRules 𝒜ctc Pred⟦_⟧
 
 data CtcProgress : (s : State) → (e : Ann ∣ [] ⊢ τ) → Set where
   CP-step :
@@ -112,7 +114,7 @@ ctc-pending-progress `R-cross-nat ⊨e/fb
   pending@record  { tyVarsWit = refl
                   ; term₁ = mkTerm ψ₁ refl
                   ; premiseWit = iv }
-  = (if flat-pred (ψ₁(here refl)) iv then Ok else Err) ,
+  = (if Pred⟦ flat-pred (ψ₁(here refl)) ⟧ iv then Ok else Err) ,
     _ ,
     Pending⇒Step pending (λ ()) (Ok , (refl ,′ refl) ,′ refl)
 ctc-pending-progress `R-cross-cons ⊨e/fb

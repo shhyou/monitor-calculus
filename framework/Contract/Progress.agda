@@ -16,13 +16,10 @@ open import Data.List.Base as List using (List; []; _∷_; [_]; lookup; _++_; re
 import Data.List.Properties as List
 open import Data.List.Relation.Unary.Any as ListAny using (Any; any?; here; there)
 
+open import Function.Base using (id; const; _∘′_; _$′_)
+
 import Data.Nat.Literals
 open import Agda.Builtin.FromNat
-
-private
-  instance
-    NumNumber : Number ℕ
-    NumNumber = Data.Nat.Literals.number
 
 open import Syntax.Type
 open import Syntax.Term
@@ -38,12 +35,36 @@ open import Contract.Base Label 𝒜sctc as StdCtc hiding (𝒜sctc)
 open AnnTerm 𝒜sctc
 open AnnRule 𝒜sctc
 
-AnnTerm.Ann   𝒜sctc τ = List (SCtc1N [] τ)
+private
+  variable τ τ′ τ₁ τ₂ τₐ τᵣ : Ty
+  instance
+    NumNumber : Number ℕ
+    NumNumber = Data.Nat.Literals.number
+
+record ListSCtc τ : Set where
+  constructor mkListSCtc; inductive
+  field       runListSCtc : List (SCtc1N [] τ)
+open ListSCtc public
+
+mapLSCtc : (SCtc1N [] τ → SCtc1N [] τ′) → ListSCtc τ → ListSCtc τ′
+mapLSCtc f = mkListSCtc ∘′ map f ∘′ runListSCtc
+
+AnnTerm.Ann   𝒜sctc τ = ListSCtc τ
 AnnTerm.State 𝒜sctc   = Status
+
+iso𝒜view : AnnTermView 𝒜sctc StdCtc.𝒜sctc
+iso𝒜view = mkView runListSCtc
+                  id
+                  const
+                  (λ s₁ → refl)
+                  (λ s₁ s₂ → refl)
+                  (λ s₁ s₂ s₂′ → refl)
+
+open AnnTermView iso𝒜view
 
 𝒯 : ℕ → AnnTransit 𝒜sctc
 𝒯 zero    = ∅tr
-𝒯 (suc i) = 𝒯sctc id𝒜view (𝒯 i)
+𝒯 (suc i) = 𝒯sctc iso𝒜view (𝒯 i)
 
 infix 6 ∎_
 infixl 5 _►_checking⟨_∣_⟩
@@ -65,12 +86,12 @@ record Frame (j : ℕ) {τ} e eᵣ sκs eκ : Set where
     pending : PendingStep (R-cross-nat Ann) eᵣ
     sκs-init : List (SCtc1N [] `ℕ)
     redex : Ann ∣ e ⦂ τ ▷ eᵣ ⦂ `ℕ
-    {sκs-all} : List (SCtc1N [] `ℕ)
+    {sκs-all} : ListSCtc `ℕ
     {n} : Ann ∣ [] ⊢ `ℕ
     redex-eq : eᵣ ≡ B# sκs-all ⟪ n ⟫
     nval : Ann ∣ n isvalof `ℕ
-    split-eq : sκs-all ≡ sκs-init ++ sκs
-    chk-steps : CheckingSteps id𝒜view (𝒯 j) nval Ok Ok eκ sκs-init
+    split-eq : getAnn sκs-all ≡ sκs-init ++ sκs
+    chk-steps : CheckingSteps iso𝒜view (𝒯 j) nval Ok Ok eκ sκs-init
 
 accept-checking-frame : ∀ {j τ} {e : Ann ∣ [] ⊢ τ} {m eᵣ} →
   Ann ∣ m isvalof `ℕ →
@@ -87,13 +108,13 @@ accept-checking-frame {j = j}
                                             (_ , (refl ,′ refl) ,′ subst-check-nat-sctcs))))
 
   where
-    acc-checkNatSCtcs = proj₂ (accept-check-nat-sctcs id𝒜view (𝒯 j) refl chk-steps iv)
+    acc-checkNatSCtcs = proj₂ (accept-check-nat-sctcs iso𝒜view (𝒯 j) refl chk-steps iv)
 
     check-nat-sctcs-ty : List (SCtc1N [] `ℕ) → Set
     check-nat-sctcs-ty sκs =
-      checkNatSCtcs id𝒜view (𝒯 j) sκs (termEnv(here refl)) Ok Ok
+      checkNatSCtcs iso𝒜view (𝒯 j) sκs (termEnv(here refl)) Ok Ok
 
-    sκs-eq : sκs-init ≡ ψ₁(here refl)
+    sκs-eq : sκs-init ≡ getAnn(ψ₁(here refl))
     sκs-eq = sym (trans split-eq (List.++-identityʳ sκs-init))
 
     subst-check-nat-sctcs = subst check-nat-sctcs-ty sκs-eq acc-checkNatSCtcs
@@ -111,11 +132,11 @@ reject-checking-frame {j = j} {sκs = sκs}
                                             (_ , (refl ,′ refl) ,′ subst-check-nat-sctcs))))
 
   where
-    l,checkNatSCtcs = reject-check-nat-sctcs id𝒜view (𝒯 j) sκs refl chk-steps
+    l,checkNatSCtcs = reject-check-nat-sctcs iso𝒜view (𝒯 j) sκs refl chk-steps
 
     check-nat-sctcs-ty : List (SCtc1N [] `ℕ) → Set
     check-nat-sctcs-ty sκs =
-      checkNatSCtcs id𝒜view (𝒯 j) sκs (termEnv(here refl)) Ok (Err (proj₁ l,checkNatSCtcs))
+      checkNatSCtcs iso𝒜view (𝒯 j) sκs (termEnv(here refl)) Ok (Err (proj₁ l,checkNatSCtcs))
 
     subst-check-nat-sctcs = subst check-nat-sctcs-ty (sym split-eq) (proj₂ l,checkNatSCtcs)
 
@@ -133,11 +154,11 @@ error-checking-frame {j = j} {sκs = sκs} {l = l}
                                             (λ ())
                                             (_ , (refl ,′ refl) ,′ subst-check-nat-sctcs))))
   where
-    err-checkNatSCtcs = error-check-nat-sctcs id𝒜view (𝒯 j) sκs refl chk-steps err-step refl
+    err-checkNatSCtcs = error-check-nat-sctcs iso𝒜view (𝒯 j) sκs refl chk-steps err-step refl
 
     check-nat-sctcs-ty : List (SCtc1N [] `ℕ) → Set
     check-nat-sctcs-ty sκs =
-      checkNatSCtcs id𝒜view (𝒯 j) sκs (termEnv(here refl)) Ok (Err l)
+      checkNatSCtcs iso𝒜view (𝒯 j) sκs (termEnv(here refl)) Ok (Err l)
 
     subst-check-nat-sctcs = subst check-nat-sctcs-ty (sym split-eq) err-checkNatSCtcs
 
@@ -167,7 +188,7 @@ step-sctc-frames : ∀ {i j evs eᵣ eκ eκ′ sκs} →
   SCtcFrames i j (evs ► eᵣ checking⟨ eκ′ ∣ sκs ⟩)
 step-sctc-frames {j = j} step (frames ∷ᶠ mkFrame pending sκs-init ec redex-eq nval split-eq chk-steps) =
   frames ∷ᶠ mkFrame pending sκs-init ec redex-eq nval split-eq stepped-chk-steps
-  where stepped-chk-steps = step-check-nat-sctcs id𝒜view (𝒯 j) step refl chk-steps
+  where stepped-chk-steps = step-check-nat-sctcs iso𝒜view (𝒯 j) step refl chk-steps
 
 next-sctc-frames : ∀ {i j evs eᵣ m sκ sκs} →
   Ann ∣ m isvalof `ℕ →
@@ -177,7 +198,7 @@ next-sctc-frames {j = j} {sκ = sκ} {sκs} iv
   (frames ∷ᶠ mkFrame pending sκs-init ec redex-eq nval split-eq chk-steps)
   rewrite sym (List.++-assoc sκs-init [ sκ ] sκs)
   = _ , frames ∷ᶠ mkFrame pending (sκs-init ++ [ sκ ]) ec redex-eq nval split-eq (proj₂ eκ,chk-steps′)
-  where eκ,chk-steps′ = next-checking-steps id𝒜view (𝒯 j) iv chk-steps sκ
+  where eκ,chk-steps′ = next-checking-steps iso𝒜view (𝒯 j) iv chk-steps sκ
 
 mutual
   data SCtcProgress : ℕ → Frames → Set where
@@ -301,7 +322,7 @@ mutual
             R-bdr `R-cross-unit Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending (λ ()) (refl ,′ refl)))))
   sctc-pending-progress i e ec `R-cross-nat pending@(mkPendingStep refl termEnv (mkTerm ψ₁ refl) iv)
-    with ec | ψ₁(here refl) in split-eq
+    with ec | getAnn(ψ₁(here refl)) in split-eq
   ... | ec | []
     = inj₁ (_ ,
             R-bdr `R-cross-nat Ok Ok
@@ -310,7 +331,7 @@ mutual
                                               (Ok , (refl ,′ refl) ,′ subst-check-nat-sctcs)))))
     where
       check-nat-sctcs-ty : List (SCtc1N [] `ℕ) → Set
-      check-nat-sctcs-ty sκs = checkNatSCtcs id𝒜view (𝒯 i) sκs (termEnv (here refl)) Ok Ok
+      check-nat-sctcs-ty sκs = checkNatSCtcs iso𝒜view (𝒯 i) sκs (termEnv (here refl)) Ok Ok
       subst-check-nat-sctcs = subst check-nat-sctcs-ty (sym split-eq) refl
   ... | ec | (flat l ep ∷ sκs)
     = inj₂ (_ , _ , _ , mkFrame pending [ flat l ep ] ec refl iv split-eq [ R-refl , refl ]ᶜ)
@@ -321,8 +342,8 @@ mutual
             R-bdr `R-cross-cons Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
-                                                (here refl) → map */c-sκ₁ (ψ₁ (here refl))
-                                                (there (here refl)) → map */c-sκ₂ (ψ₁(here refl)))
+                                                (here refl) → mapLSCtc */c-sκ₁ (ψ₁ (here refl))
+                                                (there (here refl)) → mapLSCtc */c-sκ₂ (ψ₁(here refl)))
                                               ((refl ,′ refl) ,′ refl ,′ refl)))))
   sctc-pending-progress i e ec `R-cross-inl
     pending@record  { tyVarsWit = ((τ₁ , τ₂) , refl)
@@ -330,7 +351,7 @@ mutual
     = inj₁ (_ ,
             R-bdr `R-cross-inl Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
-                                              (λ where (here refl) → map +/c-sκ₁ (ψ₁(here refl)))
+                                              (λ where (here refl) → mapLSCtc +/c-sκ₁ (ψ₁(here refl)))
                                               ((refl ,′ refl) ,′ refl)))))
   sctc-pending-progress i e ec `R-cross-inr
     pending@record  { tyVarsWit = ((τ₁ , τ₂) , refl)
@@ -338,7 +359,7 @@ mutual
     = inj₁ (_ ,
             R-bdr `R-cross-inr Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
-                                              (λ where (here refl) → map +/c-sκ₂ (ψ₁(here refl)))
+                                              (λ where (here refl) → mapLSCtc +/c-sκ₂ (ψ₁(here refl)))
                                               ((refl ,′ refl) ,′ refl)))))
   sctc-pending-progress i e ec `R-cross-roll
     pending@record  { tyVarsWit = (τ′ , refl)
@@ -346,7 +367,7 @@ mutual
     = inj₁ (_ ,
             R-bdr `R-cross-roll Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
-                                              (λ where (here refl) → map μ/c-sκ (ψ₁(here refl)))
+                                              (λ where (here refl) → mapLSCtc μ/c-sκ (ψ₁(here refl)))
                                               ((refl ,′ refl) ,′ refl)))))
   sctc-pending-progress i e ec `R-cross-box
     pending@record  { tyVarsWit = (τ′ , refl)
@@ -367,7 +388,8 @@ mutual
             R-bdr `R-merge-box Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
-                                                (here refl) → ψ₁(there (here refl)) ++ ψ₁(here refl))
+                                                (here refl) →
+                                                  mkListSCtc $′ getAnn(ψ₁(there (here refl))) ++ getAnn(ψ₁(here refl)))
                                               ((refl ,′ refl) ,′ refl)))))
   sctc-pending-progress i e ec `R-merge-lam
     pending@record  { tyVarsWit = ((τₐ , τᵣ) , refl)
@@ -376,14 +398,15 @@ mutual
             R-bdr `R-merge-lam Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
-                                                (here refl) → ψ₁(there (here refl)) ++ ψ₁(here refl))
+                                                (here refl) →
+                                                  mkListSCtc $′ getAnn(ψ₁(there (here refl))) ++ getAnn(ψ₁(here refl)))
                                               ((refl ,′ refl) ,′ refl)))))
   sctc-pending-progress i e ec `R-proxy-unbox
     pending@record { term₁ = mkTerm ψ₁ refl }
     = inj₁ (_ ,
             R-bdr `R-proxy-unbox Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
-                                              (λ where (here refl) → map box/c-sκ (ψ₁(here refl)))
+                                              (λ where (here refl) → mapLSCtc box/c-sκ (ψ₁(here refl)))
                                               ((refl ,′ refl) ,′ refl)))))
   sctc-pending-progress i e ec `R-proxy-β
     pending@record  { tyVarsWit = τₐ
@@ -392,6 +415,6 @@ mutual
             R-bdr `R-proxy-β Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
-                                                (here refl) → reverse (map →/c-dom-sκ (ψ₁(here refl)))
-                                                (there (here refl)) → map →/c-rng-sκ (ψ₁(here refl)))
+                                                (here refl) → mkListSCtc $′ reverse (map →/c-dom-sκ (getAnn(ψ₁(here refl))))
+                                                (there (here refl)) → mapLSCtc →/c-rng-sκ (ψ₁(here refl)))
                                               ((refl ,′ refl) ,′ refl ,′ refl)))))
