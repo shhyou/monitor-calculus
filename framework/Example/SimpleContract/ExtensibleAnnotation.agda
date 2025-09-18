@@ -8,11 +8,7 @@ open import Syntax.Type
 open import Syntax.Term
 open import Annotation.Language
 
-module Example.SimpleContract.ExtensibleAnnotation
-  (𝒜 : AnnTerm)
-  {m}
-  (Pred⟦_⟧ : Fin m → ∀ {v} → ATAnn 𝒜 ∣ v isvalof `ℕ → Bool)
-  where
+module Example.SimpleContract.ExtensibleAnnotation (m : ℕ) where
 
 open import Relation.Binary.PropositionalEquality as PropEq
   using (_≡_; refl)
@@ -31,17 +27,12 @@ open import Function.Base using (id)
 open import Syntax.Template
 open import OpSemantics.Base
 
-open AnnTerm 𝒜 using (Ann; State)
-
 import TransitionRelationUtil
+
 private
   variable
-    𝒯 : AnnTransit 𝒜
     Δ Δ′ : TCtxt
     τ τ₁ τ₂ τₐ τᵣ : TyN Δ
-    e : Ann ∣ [] ⊢ τ
-    v : Ann ∣ [] ⊢ τ
-  module TR = TransitionRelationUtil State
 
 data CtcN : (Δ : TCtxt) → TyN Δ → Set where
   `_    : (a : tt ∈ Δ) → CtcN Δ (` a)
@@ -102,8 +93,8 @@ AnnTerm.State 𝒜ctc   = Status
 κsubst (κₐ →/c κᵣ) σκ = κsubst κₐ σκ →/c κsubst κᵣ σκ
 κsubst (μ/c κ)     σκ = μ/c (κsubst κ (κext σκ))
 
-flat-pred : CtcN Δ `ℕ → (Ann ∣ v isvalof `ℕ) → Bool
-flat-pred (flat Pₘ) = Pred⟦ Pₘ ⟧
+flat-pred : CtcN Δ `ℕ → Fin m
+flat-pred (flat Pₘ) = Pₘ
 
 */c-κ₁ : CtcN Δ (τ₁ `* τ₂) → CtcN Δ τ₁
 */c-κ₁ (κ₁ */c κ₂) = κ₁
@@ -133,8 +124,19 @@ box/c-κ (box/c κ) = κ
 μ/c-κ′ (μ/c κ) = κ
 
 
-module _ (𝒜ctc-view : AnnTermView 𝒜 𝒜ctc) where
+module MonRules (𝒜 : AnnTerm)
+                (Pred⟦_⟧ : Fin m → ∀ {v} → ATAnn 𝒜 ∣ v isvalof `ℕ → Bool)
+                (𝒜ctc-view : AnnTermView 𝒜 𝒜ctc)
+  where
+  open AnnTerm 𝒜 using (Ann; State)
   open AnnTermViewUtils 𝒜ctc-view
+
+  private
+    variable
+      𝒯 : AnnTransit 𝒜
+      e : Ann ∣ [] ⊢ τ
+      v : Ann ∣ [] ⊢ τ
+    module TR = TransitionRelationUtil State
 
   𝒯c : AnnTransit 𝒜
   𝒯c `R-cross-unit  (_ , refl)             (ϑ , tt)              ψ ψ′ =
@@ -143,7 +145,7 @@ module _ (𝒜ctc-view : AnnTermView 𝒜 𝒜ctc) where
     guardState Ok  TR.∘
     λ s s′ →
       getAnn[ κ ← ψ(here refl) ]
-        s′ ≡ putState (if (flat-pred κ isval) then Ok else Err) s
+        s′ ≡ putState (if (Pred⟦ flat-pred κ ⟧ isval) then Ok else Err) s
   𝒯c `R-cross-cons  (_ , (τ₁ , τ₂) , refl) (ϑ , isval₁ , isval₂) ψ ψ′ =
     guardState Ok  TR.∩  TR.[ getAnn[ κ , κ₁ , κ₂ ← ψ(here refl) , ψ′(here refl) , ψ′(there (here refl)) ]
                                 κ₁ ≡ */c-κ₁ κ ×

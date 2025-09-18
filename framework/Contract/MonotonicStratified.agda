@@ -22,7 +22,7 @@ import Data.List.Relation.Unary.All.Properties as ListAll
 open import Data.List.Relation.Unary.Any as ListAny using (Any; any?; here; there)
 open import Data.List.Membership.Propositional using (_∈_)
 
-open import Function.Base using (id; _∘′_)
+open import Function.Base using (id; const; _∘′_)
 
 open import Utils.Misc
 open import Syntax.Type
@@ -38,23 +38,38 @@ open import Contract.Base Label 𝒜ctc as StdCtc
 open import Contract.Satisfaction Label 𝒜ctc
 open import Contract.Monotonic Label 𝒜ctc
 
-AnnTerm.Ann   𝒜ctc τ = List (SCtc1N [] τ)
+record ListSCtc (τ : Ty) : Set where
+  inductive
+  field runListSCtc : List (SCtc1N [] τ)
+open ListSCtc
+
+AnnTerm.Ann   𝒜ctc τ = ListSCtc τ
 AnnTerm.State 𝒜ctc   = Status
+
+iso𝒜view : AnnTermView 𝒜ctc 𝒜sctc
+iso𝒜view = mkView runListSCtc
+                  id
+                  const
+                  (λ s₁ → refl)
+                  (λ s₁ s₂ → refl)
+                  (λ s₁ s₂ s₂′ → refl)
+
+open AnnTermView iso𝒜view
 
 𝒯 : ℕ → AnnTransit 𝒜ctc
 𝒯 zero = ∅tr
-𝒯 (suc i) = 𝒯sctc id𝒜view (𝒯 i)
+𝒯 (suc i) = 𝒯sctc iso𝒜view (𝒯 i)
 
 
 ℐerrmono* : (i : ℕ) → AnnInvr (𝒯 i)
 AnnInvr.Ix         (ℐerrmono* i) = ⊤
 AnnInvr.IxRel      (ℐerrmono* i) sκs ix ix′ = ⊤
 AnnInvr.Inv        (ℐerrmono* i) s = ⊤
-AnnInvr.Ord        (ℐerrmono* i) = ErrMono id𝒜view
-AnnInvr.isPreorder (ℐerrmono* i) = emIsPreorder id𝒜view
+AnnInvr.Ord        (ℐerrmono* i) = ErrMono iso𝒜view
+AnnInvr.isPreorder (ℐerrmono* i) = emIsPreorder iso𝒜view
 AnnInvr.𝔹          (ℐerrmono* zero) sκs ix◁ix′ e = ⊥
 AnnInvr.𝔹          (ℐerrmono* (suc i)) sκs ix◁ix′ e =
-  All (SCtcSat (ℐerrmono* i) tt) sκs
+  All (SCtcSat (ℐerrmono* i) tt) (getAnn sκs)
 AnnInvr.𝔹Sound     (ℐerrmono* zero) step inv inv′ mono ()
 AnnInvr.𝔹Sound     (ℐerrmono* (suc i)) {A = sκs} step inv inv′ mono bsat = bsat
 AnnInvr.ℙ          (ℐerrmono* i) {τ = τ} sκs ix◁ix′ em =
@@ -110,7 +125,7 @@ AnnInvr.ℙ          (ℐerrmono* i) {τ = τ} sκs ix◁ix′ em =
   (B/i ix ix′ ix◁ix′ bsat esat)
   termSat@record { boundarySat = _ , κsats } =
     _ ,
-    checkNatSCtcsMono id𝒜view (𝒯 i) (ψ₁(here refl)) checks-tr
+    checkNatSCtcsMono iso𝒜view (𝒯 i) (getAnn(ψ₁(here refl))) checks-tr
 ℐerrmono*-monotonic (suc i) `R-cross-cons
   (mkStep ((τ₁ , τ₂) , refl) termEnv (mkTerm ψ₁ refl) (mkTerm ψ₂ refl) premWit
     trWit@((s-eq , s≡s′@refl) , (sκs₁-eq , sκs₂-eq)))
@@ -369,7 +384,7 @@ AnnInvr.ℙ          (ℐerrmono* i) {τ = τ} sκs ix◁ix′ em =
                             (ListAll.map sκsat-rng κsats)) ,′
         (tt , all-reverse-map-subst (SCtcSat (ℐerrmono* i) tt)
                                     →/c-dom-sκ
-                                    (ψ₁(here refl))
+                                    (getAnn(ψ₁(here refl)))
                                     (sym sκsₐ-eq)
                                     (all-reverse (ListAll.map sκsat-dom κsats)))
     }

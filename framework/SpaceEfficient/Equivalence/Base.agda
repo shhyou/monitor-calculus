@@ -24,13 +24,22 @@ open import Contract.Base Label 𝒜csctc
 open import SpaceEfficient.Base Label 𝒜csctc
 open AnnTerm 𝒜csctc using (Ann; State)
 
+private variable τ τ′ : Ty
 
-AnnTerm.Ann   𝒜csctc τ = SECtcN [] τ × List (SCtc1N [] τ)
+record EqCtcs τ : Set where
+  inductive
+  constructor ⟨_~_⟩
+  field
+    getSECtc : SECtcN [] τ
+    getLSCtc : List (SCtc1N [] τ)
+open EqCtcs public
+
+AnnTerm.Ann   𝒜csctc τ = EqCtcs τ
 AnnTerm.State 𝒜csctc = Status × Status
 
 
 𝒜sctc-view : AnnTermView 𝒜csctc 𝒜sctc
-𝒜sctc-view = mkView proj₂
+𝒜sctc-view = mkView getLSCtc
                     proj₂
                     (λ s → Product.map₂ (const s))
                     (λ s → refl)
@@ -39,7 +48,7 @@ AnnTerm.State 𝒜csctc = Status × Status
 
 
 𝒜cctc-view : AnnTermView 𝒜csctc 𝒜cctc
-𝒜cctc-view = mkView proj₁
+𝒜cctc-view = mkView getSECtc
                     proj₁
                     (λ s → Product.map₁ (const s))
                     (λ s → refl)

@@ -75,7 +75,7 @@ AnnInvr.Ord        ℐchkbnd = trivialOrd
 AnnInvr.isPreorder ℐchkbnd = trivialOrdIsPreorder
 AnnInvr.Inv        ℐchkbnd = Inv
 AnnInvr.𝔹          ℐchkbnd cκ ix◁ix′ e =
-  SECtcPreds (ord-preds ⊇#_) cκ
+  SECtcPreds (ord-preds ⊇#_) (runAnn cκ)
 AnnInvr.𝔹Sound     ℐchkbnd (R-redex step)            inv inv′ mono c#⊆U = c#⊆U
 AnnInvr.𝔹Sound     ℐchkbnd (R-bdr rule-no s s′ step) inv inv′ mono c#⊆U = c#⊆U
 AnnInvr.ℙ          ℐchkbnd cκ ix◁ix′ em =
@@ -110,14 +110,14 @@ AnnInvr.ℙ          ℐchkbnd cκ ix◁ix′ em =
     where
       open ≤-Reasoning
 
-      cκ-preds = flat/cc-preds (ψ₁(here refl))
+      cκ-preds = flat/cc-preds (runAnn(ψ₁(here refl)))
 
       s₃-chkcost,s₃-secost,cnt-eq : State.cost/chk s₁ ≡ State.cost/chk s₃ ×
                                     State.cost/se s₁ ≡ State.cost/se s₃ ×
                                     State.count s₁ ≡ State.count s₃
       s₃-chkcost,s₃-secost,cnt-eq =
         check-nat-cctc-preserve-state cκ-preds
-                                      (subst check-nat-ty (flat/cc-η (ψ₁(here refl))) cκ-checks-tr)
+                                      (subst check-nat-ty (flat/cc-η (runAnn(ψ₁(here refl)))) cκ-checks-tr)
         where check-nat-ty = λ cκ → checkNatSECtc cκ (termEnv(here refl)) s₁ s₃
 
       len-cκ-preds≤len-ord-preds : length cκ-preds ≤ check-bound ord-preds

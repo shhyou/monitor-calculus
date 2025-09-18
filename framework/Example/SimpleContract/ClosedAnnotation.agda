@@ -128,7 +128,7 @@ box/c-κ (box/c κ) = κ
 μ/c-κ′ : CtcN Δ (μ τ) → CtcN (tt ∷ Δ) τ
 μ/c-κ′ (μ/c κ) = κ
 
-module _ (Pred⟦_⟧ : Fin m → ∀ {v} → ATAnn 𝒜ctc ∣ v isvalof `ℕ → Bool) where
+module MonRules (Pred⟦_⟧ : Fin m → ∀ {v} → ATAnn 𝒜ctc ∣ v isvalof `ℕ → Bool) where
   𝒯c : AnnTransit 𝒜ctc
   𝒯c `R-cross-unit  (_ , refl)             (ϑ , tt)              ψ ψ′ =
     λ s s′ →

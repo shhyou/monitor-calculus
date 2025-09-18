@@ -18,7 +18,7 @@ open import Data.List.Relation.Unary.All as ListAll using (All; []; _∷_)
 import Data.List.Relation.Unary.All.Properties as ListAll
 open import Data.List.Relation.Unary.Any as ListAny using (Any; here; there)
 
-open import Function.Base using (_∘_)
+open import Function.Base using (id; const; _∘_)
 
 open ≡-Reasoning using (begin_; _∎; step-≡-⟨; step-≡-⟩; step-≡-∣)
 
@@ -32,6 +32,8 @@ open import Annotation.Invariant
 open import Annotation.Soundness
 
 𝒜blame-sctc : AnnTerm
+open AnnTerm 𝒜blame-sctc
+open AnnRule 𝒜blame-sctc
 
 open import Blame.Base Label
 
@@ -39,14 +41,43 @@ open import Contract.Common Label
 open import Contract.Base Label 𝒜blame-sctc
 open import Contract.Satisfaction Label 𝒜blame-sctc
 
-AnnTerm.Ann   𝒜blame-sctc τ = (Label × Label) × List (Blame × SCtc1N [] τ)
+private variable
+  τ τ′ τ₁ τ₂ τₐ τᵣ : Ty
+  i j : ℕ
+  e eᵣ : Ann ∣ [] ⊢ τ
+  eκ : Ann ∣ [] ⊢ `ℕ
+
+infix 2 ⟨_⟩,_
+
+record Owners×ListBSCtc τ : Set where
+  inductive
+  constructor ⟨_⟩,_
+  field
+    getOwner : Label × Label
+    getListBSCtc : List (Blame × SCtc1N [] τ)
+
+mapBSCtc : (List (Blame × SCtc1N [] τ) → List (Blame × SCtc1N [] τ′))
+          → Owners×ListBSCtc τ → Owners×ListBSCtc τ′
+mapBSCtc f obsctc = ⟨ Owners×ListBSCtc.getOwner obsctc ⟩,
+                    f (Owners×ListBSCtc.getListBSCtc obsctc)
+
+AnnTerm.Ann   𝒜blame-sctc τ = Owners×ListBSCtc τ
 AnnTerm.State 𝒜blame-sctc   = Status
 
-open AnnBlameContractLang 𝒜blame-sctc hiding (𝒜blame-sctc)
-open import Blame.Ownership Label 𝒜blame-sctc-owner-view 𝒜blame-sctc-blame-view
+module BlameStdCtc = AnnBlameContractLang 𝒜blame-sctc
+open BlameStdCtc hiding (𝒜blame-sctc)
 
-open AnnTerm 𝒜blame-sctc
-open AnnRule 𝒜blame-sctc
+iso𝒜view : AnnTermView 𝒜blame-sctc BlameStdCtc.𝒜blame-sctc
+iso𝒜view = mkView (λ A → Owners×ListBSCtc.getOwner A ,′ Owners×ListBSCtc.getListBSCtc A)
+                  id
+                  const
+                  (λ s₁ → refl)
+                  (λ s₁ s₂ → refl)
+                  (λ s₁ s₂ s₂′ → refl)
+
+open import Blame.Ownership Label
+                            (annTermViewCompose 𝒜blame-sctc-owner-view iso𝒜view)
+                            (annTermViewCompose 𝒜blame-sctc-blame-view iso𝒜view)
 
 infix 6 ∎_
 infixl 5 _►_checking⟨_∣_⟩
@@ -72,7 +103,7 @@ record Frame (j : ℕ) {τ} e eᵣ bsκs eκ : Set where
     {n} : Ann ∣ [] ⊢ `ℕ
     {ℓₙ ℓₚ} : Label
     redex-intr : ℐowner (suc j) ⊨[ ℓₙ ] eᵣ
-    redex-eq : eᵣ ≡ B# ((ℓₙ ,′ ℓₚ) ,′ bsκs-all) ⟪ n ⟫
+    redex-eq : eᵣ ≡ B# ⟨ ℓₙ ,′ ℓₚ ⟩, bsκs-all ⟪ n ⟫
     nval : Ann ∣ n isvalof `ℕ
     split-eq : bsκs-all ≡ bsκs-init ++ bsκs
     chk-steps : CheckingSteps 𝒜sctc-view (𝒯 j) nval Ok Ok eκ (map proj₂ bsκs-init)
@@ -98,7 +129,7 @@ accept-checking-frame {j = j}
     check-nat-sctcs-ty bsκs =
       checkNatSCtcs 𝒜sctc-view (𝒯 j) (map proj₂ bsκs) (termEnv(here refl)) Ok Ok
 
-    bsκs-eq : bsκs-init ≡ proj₂(ψ₁(here refl))
+    bsκs-eq : bsκs-init ≡ getBSCtc(ψ₁(here refl))
     bsκs-eq = sym (trans split-eq (List.++-identityʳ bsκs-init))
 
     subst-check-nat-sctcs = subst check-nat-sctcs-ty bsκs-eq acc-checkNatSCtcs
@@ -122,7 +153,7 @@ reject-checking-frame {j = j} {bsκs = bsκs}
     check-nat-sctcs-ty sκs =
       checkNatSCtcs 𝒜sctc-view (𝒯 j) sκs (termEnv(here refl)) Ok (Err (proj₁ l,checkNatSCtcs))
 
-    bsκs-eq : map proj₂ (proj₂(ψ₁(here refl))) ≡ map proj₂ bsκs-init ++ map proj₂ bsκs
+    bsκs-eq : map proj₂ (getBSCtc(ψ₁(here refl))) ≡ map proj₂ bsκs-init ++ map proj₂ bsκs
     bsκs-eq = trans (cong (map proj₂) split-eq) (List.map-++ proj₂ bsκs-init bsκs)
 
     subst-check-nat-sctcs = subst check-nat-sctcs-ty (sym bsκs-eq) (proj₂ l,checkNatSCtcs)
@@ -147,7 +178,7 @@ error-checking-frame {j = j} {bsκs = bsκs} {l = l}
     check-nat-sctcs-ty sκs =
       checkNatSCtcs 𝒜sctc-view (𝒯 j) sκs (termEnv(here refl)) Ok (Err l)
 
-    bsκs-eq : map proj₂ (proj₂(ψ₁(here refl))) ≡ map proj₂ bsκs-init ++ map proj₂ bsκs
+    bsκs-eq : map proj₂ (getBSCtc(ψ₁(here refl))) ≡ map proj₂ bsκs-init ++ map proj₂ bsκs
     bsκs-eq = trans (cong (map proj₂) split-eq) (List.map-++ proj₂ bsκs-init bsκs)
 
     subst-check-nat-sctcs = subst check-nat-sctcs-ty (sym bsκs-eq) err-checkNatSCtcs
@@ -369,7 +400,7 @@ mutual
             R-bdr `R-cross-unit Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending (λ ()) (tt , tt , refl ,′ refl)))))
   blame-sctc-pending-progress i ⊨eown ec `R-cross-nat pending@(mkPendingStep refl termEnv (mkTerm ψ₁ refl) iv)
-    with ec | proj₂(ψ₁(here refl)) in split-eq
+    with ec | getBSCtc(ψ₁(here refl)) in split-eq
   ... | ec | []
     = inj₁ (_ ,
             R-bdr `R-cross-nat Ok Ok
@@ -395,7 +426,7 @@ mutual
                                 iv
                                 split-eq
                                 [ R-refl , refl ]ᶜ)
-    where ℓₙ,ℓₚ = proj₁(ψ₁(here refl))
+    where ℓₙ,ℓₚ = getOwner(ψ₁(here refl))
 
           ℓₙ,⊨eᵣown = idecompose-by-ectxt ec ⊨eown
 
@@ -413,9 +444,9 @@ mutual
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
                                                 (here refl) →
-                                                  Product.map₂ (map (Product.map₂ */c-sκ₁)) ⟨ℓₙ,ℓₚ⟩,bsκs
+                                                  mapBSCtc (map (Product.map₂ */c-sκ₁)) ⟨ℓₙ,ℓₚ⟩,bsκs
                                                 (there (here refl)) →
-                                                  Product.map₂ (map (Product.map₂ */c-sκ₂)) ⟨ℓₙ,ℓₚ⟩,bsκs)
+                                                  mapBSCtc (map (Product.map₂ */c-sκ₂)) ⟨ℓₙ,ℓₚ⟩,bsκs)
                                               ( ( sym (List.map-∘ bsκs) ,′
                                                   sym (List.map-∘ bsκs) ) ,′
                                                 (refl ,′ refl) ,′
@@ -435,7 +466,7 @@ mutual
                                                     map */c-sκ₂ (map proj₂ bsκs)
                                                   ∎))))))
     where ⟨ℓₙ,ℓₚ⟩,bsκs = ψ₁(here refl)
-          bsκs = proj₂ ⟨ℓₙ,ℓₚ⟩,bsκs
+          bsκs = getBSCtc ⟨ℓₙ,ℓₚ⟩,bsκs
   blame-sctc-pending-progress i ⊨eown ec `R-cross-inl
     pending@record  { tyVarsWit = ((τ₁ , τ₂) , refl)
                     ; term₁ = mkTerm ψ₁ refl }
@@ -444,7 +475,7 @@ mutual
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
                                                 (here refl) →
-                                                  Product.map₂ (map (Product.map₂ +/c-sκ₁)) ⟨ℓₙ,ℓₚ⟩,bsκs)
+                                                  mapBSCtc (map (Product.map₂ +/c-sκ₁)) ⟨ℓₙ,ℓₚ⟩,bsκs)
                                               ( sym (List.map-∘ bsκs) ,′
                                                 refl ,′
                                                 (refl ,′ refl) ,′
@@ -456,7 +487,7 @@ mutual
                                                     map +/c-sκ₁ (map proj₂ bsκs)
                                                   ∎))))))
     where ⟨ℓₙ,ℓₚ⟩,bsκs = ψ₁(here refl)
-          bsκs = proj₂ ⟨ℓₙ,ℓₚ⟩,bsκs
+          bsκs = getBSCtc ⟨ℓₙ,ℓₚ⟩,bsκs
   blame-sctc-pending-progress i ⊨eown ec `R-cross-inr
     pending@record  { tyVarsWit = ((τ₁ , τ₂) , refl)
                     ; term₁ = mkTerm ψ₁ refl }
@@ -465,7 +496,7 @@ mutual
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
                                                 (here refl) →
-                                                  Product.map₂ (map (Product.map₂ +/c-sκ₂)) ⟨ℓₙ,ℓₚ⟩,bsκs)
+                                                  mapBSCtc (map (Product.map₂ +/c-sκ₂)) ⟨ℓₙ,ℓₚ⟩,bsκs)
                                               ( sym (List.map-∘ bsκs) ,′
                                                 refl ,′
                                                 (refl ,′ refl) ,′
@@ -477,7 +508,7 @@ mutual
                                                     map +/c-sκ₂ (map proj₂ bsκs)
                                                   ∎))))))
     where ⟨ℓₙ,ℓₚ⟩,bsκs = ψ₁(here refl)
-          bsκs = proj₂ ⟨ℓₙ,ℓₚ⟩,bsκs
+          bsκs = getBSCtc ⟨ℓₙ,ℓₚ⟩,bsκs
   blame-sctc-pending-progress i ⊨eown ec `R-cross-roll
     pending@record  { tyVarsWit = (τ′ , refl)
                     ; term₁ = mkTerm ψ₁ refl }
@@ -486,7 +517,7 @@ mutual
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
                                                 (here refl) →
-                                                  Product.map₂ (map (Product.map₂ μ/c-sκ)) ⟨ℓₙ,ℓₚ⟩,bsκs)
+                                                  mapBSCtc (map (Product.map₂ μ/c-sκ)) ⟨ℓₙ,ℓₚ⟩,bsκs)
                                               ( sym (List.map-∘ bsκs) ,′
                                                 refl ,′
                                                 (refl ,′ refl) ,′
@@ -497,7 +528,7 @@ mutual
                                                 ≡⟨ List.map-∘ bsκs ⟩
                                                   map μ/c-sκ (map proj₂ bsκs) ∎))))))
     where ⟨ℓₙ,ℓₚ⟩,bsκs = ψ₁(here refl)
-          bsκs = proj₂ ⟨ℓₙ,ℓₚ⟩,bsκs
+          bsκs = getBSCtc ⟨ℓₙ,ℓₚ⟩,bsκs
   blame-sctc-pending-progress i ⊨eown ec `R-cross-box
     pending@record  { tyVarsWit = (τ′ , refl)
                     ; term₁ = mkTerm ψ₁ refl }
@@ -518,17 +549,17 @@ mutual
             R-bdr `R-merge-box Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
-                                                (here refl) → (proj₁ ℓₙ,ℓₚ ,′ proj₂ ℓ′ₙ,ℓ′ₚ) ,′
+                                                (here refl) → ⟨ proj₁ ℓₙ,ℓₚ ,′ proj₂ ℓ′ₙ,ℓ′ₚ ⟩,
                                                               bsκs′ ++ bsκs)
                                               ( List.map-++ proj₁ bsκs′ bsκs ,′
                                                 (refl ,′ match-eq) ,′
                                                 (refl ,′ refl) ,′
                                                 List.map-++ proj₂ bsκs′ bsκs)))))
-    where ℓₙ,ℓₚ = proj₁(ψ₁(here refl))
-          bsκs = proj₂(ψ₁(here refl))
+    where ℓₙ,ℓₚ = getOwner(ψ₁(here refl))
+          bsκs = getBSCtc(ψ₁(here refl))
 
-          ℓ′ₙ,ℓ′ₚ = proj₁(ψ₁(there (here refl)))
-          bsκs′ = proj₂(ψ₁(there (here refl)))
+          ℓ′ₙ,ℓ′ₚ = getOwner(ψ₁(there (here refl)))
+          bsκs′ = getBSCtc(ψ₁(there (here refl)))
 
           ℓₙ,⊨eᵣown = idecompose-by-ectxt ec ⊨eown
 
@@ -549,17 +580,17 @@ mutual
             R-bdr `R-merge-lam Ok Ok
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
-                                                (here refl) → (proj₁ ℓₙ,ℓₚ ,′ proj₂ ℓ′ₙ,ℓ′ₚ) ,′
+                                                (here refl) → ⟨ proj₁ ℓₙ,ℓₚ ,′ proj₂ ℓ′ₙ,ℓ′ₚ ⟩,
                                                               bsκs′ ++ bsκs)
                                               ( List.map-++ proj₁ bsκs′ bsκs ,′
                                                 (refl ,′ match-eq) ,′
                                                 (refl ,′ refl) ,′
                                                 List.map-++ proj₂ bsκs′ bsκs)))))
-    where ℓₙ,ℓₚ = proj₁(ψ₁(here refl))
-          bsκs = proj₂(ψ₁(here refl))
+    where ℓₙ,ℓₚ = getOwner(ψ₁(here refl))
+          bsκs = getBSCtc(ψ₁(here refl))
 
-          ℓ′ₙ,ℓ′ₚ = proj₁(ψ₁(there (here refl)))
-          bsκs′ = proj₂(ψ₁(there (here refl)))
+          ℓ′ₙ,ℓ′ₚ = getOwner(ψ₁(there (here refl)))
+          bsκs′ = getBSCtc(ψ₁(there (here refl)))
 
           ℓₙ,⊨eᵣown = idecompose-by-ectxt ec ⊨eown
 
@@ -579,7 +610,7 @@ mutual
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
                                                 (here refl) →
-                                                  Product.map₂ (map (Product.map₂ box/c-sκ)) ⟨ℓₙ,ℓₚ⟩,bsκs)
+                                                  mapBSCtc (map (Product.map₂ box/c-sκ)) ⟨ℓₙ,ℓₚ⟩,bsκs)
                                               ( sym (List.map-∘ bsκs) ,′
                                                 refl ,′
                                                 (refl ,′ refl) ,′
@@ -590,7 +621,7 @@ mutual
                                                 ≡⟨ List.map-∘ bsκs ⟩
                                                   map box/c-sκ (map proj₂ bsκs) ∎))))))
     where ⟨ℓₙ,ℓₚ⟩,bsκs = ψ₁(here refl)
-          bsκs = proj₂ ⟨ℓₙ,ℓₚ⟩,bsκs
+          bsκs = getBSCtc ⟨ℓₙ,ℓₚ⟩,bsκs
   blame-sctc-pending-progress i ⊨eown ec `R-proxy-β
     pending@record  { tyVarsWit = τₐ
                     ; term₁ = mkTerm ψ₁ refl }
@@ -599,11 +630,10 @@ mutual
               (proj₂ (plug-∃ ec (Pending⇒Step pending
                                               (λ where
                                                 (here refl) →
-                                                  Product.map (λ ℓₙ,ℓₚ → proj₂ ℓₙ,ℓₚ ,′ proj₁ ℓₙ,ℓₚ)
-                                                              (reverse ∘ map (Product.map blame-swap →/c-dom-sκ))
-                                                              ⟨ℓₙ,ℓₚ⟩,bsκs
+                                                  ⟨ proj₂ ⟨ℓₙ,ℓₚ⟩ ,′ proj₁ ⟨ℓₙ,ℓₚ⟩ ⟩,
+                                                  reverse (map (Product.map blame-swap →/c-dom-sκ) bsκs)
                                                 (there (here refl)) →
-                                                  Product.map₂ (map (Product.map₂ →/c-rng-sκ)) ⟨ℓₙ,ℓₚ⟩,bsκs)
+                                                  mapBSCtc (map (Product.map₂ →/c-rng-sκ)) ⟨ℓₙ,ℓₚ⟩,bsκs)
                                               ( ((begin
                                                     map proj₁ (reverse (map (Product.map blame-swap →/c-dom-sκ) bsκs))
                                                   ≡⟨ List.reverse-map proj₁ (map (Product.map blame-swap →/c-dom-sκ) bsκs) ⟩
@@ -630,4 +660,5 @@ mutual
                                                 ≡⟨ List.map-∘ bsκs ⟩
                                                   map →/c-rng-sκ (map proj₂ bsκs) ∎))))))
     where ⟨ℓₙ,ℓₚ⟩,bsκs = ψ₁(here refl)
-          bsκs = proj₂ ⟨ℓₙ,ℓₚ⟩,bsκs
+          ⟨ℓₙ,ℓₚ⟩ = getOwner ⟨ℓₙ,ℓₚ⟩,bsκs
+          bsκs = getBSCtc ⟨ℓₙ,ℓₚ⟩,bsκs

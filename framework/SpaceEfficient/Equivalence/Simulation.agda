@@ -49,6 +49,7 @@ open import Agda.Builtin.FromNat
 
 open import Utils.Misc
 open import Data.Tick using (Tick; evalTick; ✓_)
+import Data.VecProperties as Vec⁺
 open import Syntax.Type
 open import Syntax.Term
 
@@ -249,7 +250,7 @@ clc-join {m} {m′} {Δ = Δ} {τ = τₐ `→ τᵣ} {cκ = cκₐ →/cc cκ�
       rev-sκs++rev-sκs = reverse sκsₐ′ ++ reverse sκsₐ
 
       rev-sκs++sκs-eq : cast m′+m≡m+m′ rev-sκs++rev-sκs ≡ reverse (sκsₐ ++ sκsₐ′)
-      rev-sκs++sκs-eq = ≈-sym (Vec.reverse-++ (sym m′+m≡m+m′) sκsₐ sκsₐ′)
+      rev-sκs++sκs-eq = ≈-sym (Vec⁺.reverse-++ sκsₐ sκsₐ′)
 
       substd-clcₐ : CollapsedCtcs (m + m′)
                                   (evalTick (✓ join cκₐ′ cκₐ))
@@ -302,7 +303,7 @@ clcrename (box/clc {sκs = sκs} clc) ren
 clcrename {m} {cκ = cκₐ →/cc cκᵣ}
   (_→/clc_ {sκsₐ = sκsₐ} {sκsᵣ = sκsᵣ} clcₐ clcᵣ) ren
   rewrite sκsrename-→/c-comm sκsₐ sκsᵣ ren
-        | sκsrename-reverse-comm sκsₐ ren
+          {- | sκsrename-reverse-comm sκsₐ ren -} -- not fired
   = substd-clcₐ →/clc (clcrename clcᵣ ren) where
       substd-clcₐ : CollapsedCtcs m (cκrename cκₐ ren) (reverse (sκsrename sκsₐ ren))
       substd-clcₐ rewrite sκsrename-reverse-comm sκsₐ ren = clcrename clcₐ ren

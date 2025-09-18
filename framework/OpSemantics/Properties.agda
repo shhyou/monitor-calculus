@@ -331,7 +331,8 @@ ctxt-betarel-state-irrelevant s″ (RC-seq step)      = RC-seq (ctxt-betarel-sta
 ∅tr-⟶*-deterministic1 s step₁ (R-step steps step) with ∅tr-⟶*-deterministic1 s step₁ steps
 ... | inj₂ e₁⟶*e₃ = inj₂ (R-step e₁⟶*e₃ (∅tr-⟶-state-irrelevant s step))
 ... | inj₁ refl
-  rewrite ∅tr-⟶-preserve-state step₁ | ∅tr-⟶-preserve-state step | ∅tr-⟶-deterministic step₁ step
+  rewrite {- ∅tr-⟶-preserve-state step₁ | -} -- not fired
+          ∅tr-⟶-preserve-state step | ∅tr-⟶-deterministic step₁ step
   = inj₂ R-refl
 
 ∅tr-⟶*-deterministic : ∀ {𝒜 τ s₁ s₁′ s₂ s₂′} {e e₁ e₂ : ATAnn 𝒜 ∣ [] ⊢ τ} →

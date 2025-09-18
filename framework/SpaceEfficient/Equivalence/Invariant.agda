@@ -184,8 +184,8 @@ AnnInvr.Inv        ℐsim = is-diagonal
 AnnInvr.Ord        ℐsim = SimOrd
 AnnInvr.isPreorder ℐsim = soIsPreorder
 AnnInvr.𝔹          ℐsim csκs ix◁ix′ e =
-  SECtcSigned pos [] (proj₁ csκs) ×
-  CollapsedCtcs (length (proj₂ csκs)) (proj₁ csκs) (Vec.fromList (proj₂ csκs))
+  SECtcSigned pos [] (getSECtc csκs) ×
+  CollapsedCtcs (length (getLSCtc csκs)) (getSECtc csκs) (Vec.fromList (getLSCtc csκs))
 AnnInvr.𝔹Sound     ℐsim (R-redex step)            inv inv′ mono (pmκ , c⊆s) = pmκ ,′ c⊆s
 AnnInvr.𝔹Sound     ℐsim (R-bdr rule-no s s′ step) inv inv′ mono (pmκ , c⊆s) = pmκ ,′ c⊆s
 AnnInvr.ℙ          ℐsim csκs ix◁ix′ em =
