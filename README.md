@@ -6,7 +6,7 @@ This repository contains the Agda formalization of the proofs in the OOPSLA 2025
 paper, [Contract System Metatheories à la Carte: A Transition-System View of Contracts](https://doi.org/10.1145/3764861)
 by [Shu-Hung You](https://github.com/shhyou), [Christos Dimoulas](https://users.cs.northwestern.edu/~chrdimo/) and [Robby Findler](https://users.cs.northwestern.edu/~robby/).
 
-The proofs have been checked using Agda 2.7.0.1 and the Agda Standard Library 2.2.
+The proofs have been checked using Agda 2.8.0 and the Agda Standard Library 2.3.
 To type check the proofs, visit [framework/](framework/) and load [Everything.agda](framework/Everything.agda) [[html]](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Everything.html) in Emacs or Visual Studio Code.
 
 [The HTML version is also available](https://shhyou.github.io/monitor-calculus/html/oopsla25-formalization/Everything.html).
