@@ -1,3 +1,4 @@
 name: contract-trsys
 depend: standard-library-2.3
 include: .
+flags: --safe --without-K
